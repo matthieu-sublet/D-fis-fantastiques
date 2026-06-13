@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Défi Fantastique – Fiche de Personnage</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+  :root {
+    --parchment: #f2e8d0;
+    --parchment-dark: #e0ceaa;
+    --ink: #1a0f00;
+    --ink-light: #3d2b0f;
+    --blood: #8b1a1a;
+    --blood-dark: #5c0e0e;
+    --gold: #c9a84c;
+    --gold-light: #e8c96b;
+    --gold-dark: #8a6520;
+    --emerald: #1a5c3a;
+    --emerald-light: #2d8a58;
+    --shadow: rgba(26,15,0,0.35);
+    --section-bg: rgba(240,228,200,0.6);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'EB Garamond', serif;
+    background: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ─── Background texture ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(139,26,26,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.1) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 480px;
+    min-height: 100vh;
+    background: var(--parchment);
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: linear-gradient(180deg, #1a0a00 0%, #2d1500 60%, #1a0a00 100%);
+    border-bottom: 3px solid var(--gold);
+    padding: 18px 16px 14px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '⚔';
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    font-size: 22px; opacity: 0.6; color: var(--gold);
+  }
+  .header::after {
+    content: '⚔';
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%) scaleX(-1);
+    font-size: 22px; opacity: 0.6; color: var(--gold);
+  }
+  .header-title {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 13px;
+    color: var(--gold-light);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .header-sub {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    color: var(--parchment-dark);
+    letter-spacing: 2px;
+    opacity: 0.7;
+  }
+
+  /* ─── Nav tabs ─── */
+  .nav {
+    display: flex;
+    background: #120800;
+    border-bottom: 2px solid var(--gold-dark);
+  }
+  .nav-tab {
+    flex: 1;
+    padding: 10px 4px;
+    text-align: center;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--parchment-dark);
+    text-transform: uppercase;
+    border-right: 1px solid rgba(201,168,76,0.2);
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-tab:last-child { border-right: none; }
+  .nav-tab.active {
+    background: linear-gradient(180deg, rgba(201,168,76,0.2) 0%, rgba(201,168,76,0.05) 100%);
+    color: var(--gold-light);
+    border-bottom: 2px solid var(--gold);
+    margin-bottom: -2px;
+  }
+  .nav-tab .tab-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+
+  /* ─── Content ─── */
+  .content { flex: 1; overflow-y: auto; padding: 16px; }
+  .panel { display: none; animation: fadeIn 0.3s ease; }
+  .panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* ─── Section card ─── */
+  .card {
+    background: var(--section-bg);
+    border: 1px solid rgba(201,168,76,0.4);
+    border-radius: 4px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(26,15,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .card-header {
+    background: linear-gradient(90deg, rgba(26,15,0,0.85) 0%, rgba(61,43,15,0.85) 100%);
+    padding: 8px 14px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-header .icon { font-size: 14px; }
+  .card-body { padding: 14px; }
+
+  /* ─── Stat block ─── */
+  .stat-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    width: 90px;
+    flex-shrink: 0;
+  }
+  .stat-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+  .stat-btn {
+    width: 34px; height: 34px;
+    border: 1.5px solid var(--gold-dark);
+    background: linear-gradient(180deg, #2d1500 0%, #1a0a00 100%);
+    color: var(--gold-light);
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+  .stat-btn:active { transform: scale(0.93); background: linear-gradient(180deg, #4a2200 0%, #2d1500 100%); }
+  .stat-value {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 26px;
+    color: var(--ink);
+    min-width: 44px;
+    text-align: center;
+    line-height: 1;
+  }
+  .stat-max {
+    font-family: 'EB Garamond', serif;
+    font-size: 13px;
+    color: var(--ink-light);
+    opacity: 0.6;
+  }
+
+  /* HP bar */
+  .hp-bar-wrap {
+    flex: 1;
+    height: 10px;
+    background: rgba(26,15,0,0.15);
+    border-radius: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(26,15,0,0.2);
+  }
+  .hp-bar {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+
+  /* ─── Dice section ─── */
+  .dice-area { text-align: center; }
+  .dice-results {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .die-face {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #2d1500 0%, #1a0a00 100%);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 28px;
+    color: var(--gold-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,168,76,0.2);
+    transition: transform 0.15s;
+  }
+  .die-face.rolling { animation: shake 0.5s ease; }
+  @keyframes shake {
+    0%,100% { transform: rotate(0deg) scale(1); }
+    20% { transform: rotate(-12deg) scale(1.1); }
+    40% { transform: rotate(10deg) scale(1.1); }
+    60% { transform: rotate(-8deg) scale(1.05); }
+    80% { transform: rotate(6deg) scale(1.05); }
+  }
+  .dice-total {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 36px;
+    color: var(--ink);
+    margin: 8px 0 4px;
+  }
+  .dice-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    opacity: 0.7;
+    margin-bottom: 16px;
+  }
+  .dice-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .roll-btn {
+    padding: 11px 20px;
+    background: linear-gradient(180deg, #8b1a1a 0%, #5c0e0e 100%);
+    border: 1.5px solid #c9453a;
+    color: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .roll-btn:active { transform: scale(0.95); filter: brightness(1.2); }
+  .roll-btn.primary {
+    background: linear-gradient(180deg, #2d5a1a 0%, #1a3a0e 100%);
+    border-color: #5aab3a;
+  }
+
+  /* ─── Combat ─── */
+  .combat-log {
+    background: rgba(26,15,0,0.07);
+    border: 1px solid rgba(26,15,0,0.15);
+    border-radius: 3px;
+    padding: 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .log-entry { padding: 2px 0; border-bottom: 1px solid rgba(26,15,0,0.06); }
+  .log-entry:last-child { border-bottom: none; }
+  .log-entry.hit { color: var(--blood-dark); }
+  .log-entry.miss { color: var(--emerald); }
+  .log-entry.info { color: var(--ink-light); font-style: italic; }
+  .log-entry.dmg { color: #4a0000; font-weight: 600; }
+  .log-entry.heal { color: var(--emerald); }
+
+  .enemy-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(139,26,26,0.08);
+    border: 1px solid rgba(139,26,26,0.25);
+    border-radius: 4px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+  .enemy-name-area { flex: 1; }
+  .enemy-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--blood-dark);
+    margin-bottom: 2px;
+  }
+  .enemy-stat-row { display: flex; gap: 14px; font-size: 12px; color: var(--ink-light); }
+  .enemy-stat span { font-family: 'Cinzel', serif; font-size: 11px; }
+
+  .field-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .field-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    width: 80px;
+    flex-shrink: 0;
+  }
+  .field-input {
+    flex: 1;
+    padding: 7px 10px;
+    background: rgba(240,228,200,0.8);
+    border: 1px solid var(--gold-dark);
+    border-radius: 3px;
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    color: var(--ink);
+    outline: none;
+  }
+  .field-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.2); }
+
+  /* ─── Inventory ─── */
+  .item-list { list-style: none; }
+  .item-entry {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+  .item-entry:last-child { border-bottom: none; }
+  .item-icon { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
+  .item-name { flex: 1; font-size: 15px; color: var(--ink); }
+  .item-qty {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--ink-light);
+    background: rgba(26,15,0,0.08);
+    border: 1px solid rgba(26,15,0,0.15);
+    border-radius: 3px;
+    padding: 2px 8px;
+  }
+  .item-del {
+    width: 26px; height: 26px;
+    background: none;
+    border: 1px solid rgba(139,26,26,0.3);
+    border-radius: 3px;
+    color: var(--blood);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .add-item-row {
+    display: flex; gap: 8px; margin-top: 10px;
+  }
+  .add-item-row input {
+    flex: 1;
+    padding: 8px 10px;
+    background: rgba(240,228,200,0.8);
+    border: 1px solid var(--gold-dark);
+    border-radius: 3px;
+    font-family: 'EB Garamond', serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+  }
+  .add-item-row input::placeholder { opacity: 0.5; }
+  .add-btn {
+    padding: 8px 14px;
+    background: linear-gradient(180deg, var(--emerald-light) 0%, var(--emerald) 100%);
+    border: 1px solid rgba(45,138,88,0.6);
+    color: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Gold tracker */
+  .gold-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .gold-amount {
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 32px;
+    color: var(--gold-dark);
+  }
+  .gold-coin { font-size: 28px; }
+
+  /* ─── Notes ─── */
+  .notes-textarea {
+    width: 100%;
+    min-height: 160px;
+    padding: 12px;
+    background: rgba(240,228,200,0.7);
+    border: 1px solid var(--gold-dark);
+    border-radius: 3px;
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    color: var(--ink);
+    resize: vertical;
+    outline: none;
+    line-height: 1.7;
+  }
+  .notes-textarea:focus { border-color: var(--gold); }
+
+  /* ─── Toast ─── */
+  .toast {
+    position: fixed;
+    bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: linear-gradient(135deg, #1a0a00 0%, #2d1500 100%);
+    border: 1px solid var(--gold);
+    color: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 10px 24px;
+    border-radius: 4px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 100;
+    transition: transform 0.3s ease;
+    text-align: center;
+    max-width: 300px;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── Ornament divider ─── */
+  .ornament {
+    text-align: center;
+    color: var(--gold-dark);
+    font-size: 14px;
+    letter-spacing: 6px;
+    margin: 6px 0 14px;
+    opacity: 0.6;
+  }
+
+  /* ─── Scrollbar ─── */
+  .content::-webkit-scrollbar { width: 4px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::before, .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
+  }
+
+  .potion-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .potion-count {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .potion-pip {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--emerald-light);
+    background: rgba(26,92,58,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .potion-pip.used {
+    background: rgba(26,92,58,0.05);
+    border-color: rgba(26,92,58,0.2);
+  }
+  .potion-pip.full {
+    background: linear-gradient(135deg, #2d8a58 0%, #1a5c3a 100%);
+    box-shadow: 0 0 6px rgba(45,138,88,0.4);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">Défi Fantastique</div>
+    <div class="header-sub">Fiche de Personnage</div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav">
+    <div class="nav-tab active" onclick="showPanel('stats')">
+      <span class="tab-icon">🛡</span>Stats
+    </div>
+    <div class="nav-tab" onclick="showPanel('dice')">
+      <span class="tab-icon">🎲</span>Dés
+    </div>
+    <div class="nav-tab" onclick="showPanel('combat')">
+      <span class="tab-icon">⚔️</span>Combat
+    </div>
+    <div class="nav-tab" onclick="showPanel('inventory')">
+      <span class="tab-icon">🎒</span>Sac
+    </div>
+    <div class="nav-tab" onclick="showPanel('notes')">
+      <span class="tab-icon">📜</span>Notes
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ═══ STATS PANEL ═══ -->
+    <div class="panel active" id="panel-stats">
+
+      <!-- Identité -->
+      <div class="card">
+        <div class="card-header"><span class="icon">📖</span> Identité</div>
+        <div class="card-body">
+          <div class="field-row">
+            <span class="field-label">Nom</span>
+            <input class="field-input" id="char-name" type="text" placeholder="Votre héros…" oninput="save()">
+          </div>
+          <div class="field-row">
+            <span class="field-label">Titre</span>
+            <input class="field-input" id="char-title" type="text" placeholder="Aventurier, Mage…" oninput="save()">
+          </div>
+          <div class="field-row">
+            <span class="field-label">Livre</span>
+            <input class="field-input" id="char-book" type="text" placeholder="N° et titre du livre" oninput="save()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Caractéristiques -->
+      <div class="card">
+        <div class="card-header"><span class="icon">⚔️</span> Caractéristiques</div>
+        <div class="card-body">
+          <div class="stat-row">
+            <span class="stat-label">Habileté</span>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="changeStat('skill',-1)">−</button>
+              <span class="stat-value" id="skill-val">10</span>
+              <span class="stat-max">/ <span id="skill-max">12</span></span>
+              <button class="stat-btn" onclick="changeStat('skill',+1)">+</button>
+            </div>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Endurance</span>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="changeStat('stamina',-1)">−</button>
+              <span class="stat-value" id="stamina-val">20</span>
+              <span class="stat-max">/ <span id="stamina-max">24</span></span>
+              <button class="stat-btn" onclick="changeStat('stamina',+1)">+</button>
+            </div>
+          </div>
+          <!-- HP bar -->
+          <div style="margin-top:-4px; margin-bottom:12px; padding: 0 2px;">
+            <div class="hp-bar-wrap">
+              <div class="hp-bar" id="hp-bar" style="width:83%"></div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Chance</span>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="changeStat('luck',-1)">−</button>
+              <span class="stat-value" id="luck-val">9</span>
+              <span class="stat-max">/ <span id="luck-max">10</span></span>
+              <button class="stat-btn" onclick="changeStat('luck',+1)">+</button>
+            </div>
+          </div>
+
+          <!-- Ajuster max -->
+          <div class="ornament">· · ·</div>
+          <div class="section-title">Valeurs initiales</div>
+          <div class="field-row">
+            <span class="field-label">Hab. max</span>
+            <input class="field-input" id="skill-max-in" type="number" min="1" max="20" value="12" oninput="setMax('skill')">
+          </div>
+          <div class="field-row">
+            <span class="field-label">End. max</span>
+            <input class="field-input" id="stamina-max-in" type="number" min="1" max="40" value="24" oninput="setMax('stamina')">
+          </div>
+          <div class="field-row">
+            <span class="field-label">Cha. max</span>
+            <input class="field-input" id="luck-max-in" type="number" min="1" max="20" value="10" oninput="setMax('luck')">
+          </div>
+        </div>
+      </div>
+
+      <!-- Potions -->
+      <div class="card">
+        <div class="card-header"><span class="icon">🧪</span> Potion de Vigueur</div>
+        <div class="card-body">
+          <div style="margin-bottom:10px; font-size:13px; color:var(--ink-light);">
+            Chaque potion restaure l'Endurance à son maximum initial.
+          </div>
+          <div class="potion-row">
+            <div class="potion-count" id="potion-pips"></div>
+          </div>
+          <div style="display:flex; gap:10px; margin-top:8px;">
+            <button class="roll-btn primary" onclick="addPotion()" style="font-size:11px;padding:8px 14px;">+ Potion</button>
+            <button class="roll-btn" onclick="removePotion()" style="font-size:11px;padding:8px 14px;">– Potion</button>
+            <button class="roll-btn" onclick="drinkPotion()" style="font-size:11px;padding:8px 14px;background:linear-gradient(180deg,#2d5a1a,#1a3a0e);border-color:#5aab3a;">🧪 Boire</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Réinitialiser -->
+      <div style="text-align:center; padding: 4px 0 10px;">
+        <button class="roll-btn" onclick="resetConfirm()" style="font-size:10px; padding:8px 18px; opacity:0.6;">
+          Nouvelle partie
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══ DICE PANEL ═══ -->
+    <div class="panel" id="panel-dice">
+      <div class="card">
+        <div class="card-header"><span class="icon">🎲</span> Lancer de Dés</div>
+        <div class="card-body dice-area">
+          <div class="dice-results">
+            <div class="die-face" id="die1">–</div>
+            <div class="die-face" id="die2">–</div>
+          </div>
+          <div class="dice-total" id="dice-total">–</div>
+          <div class="dice-label" id="dice-label">Lancez les dés</div>
+          <div class="dice-buttons">
+            <button class="roll-btn primary" onclick="rollDice(2)">2d6 (Combat)</button>
+            <button class="roll-btn" onclick="rollDice(1)">1d6</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="icon">🍀</span> Tenter la Chance</div>
+        <div class="card-body">
+          <div style="font-size:14px; color:var(--ink-light); margin-bottom:12px; line-height:1.7;">
+            Lancez 2d6. Si le résultat est ≤ à votre score de Chance actuel, vous <strong>Chanceux</strong>. Sinon, vous êtes <strong>Malchanceux</strong>. Dans les deux cas, votre Chance diminue de 1.
+          </div>
+          <div id="luck-result" style="text-align:center; font-family:'Cinzel Decorative',cursive; font-size:22px; min-height:34px; margin-bottom:12px; color:var(--ink);"></div>
+          <div style="text-align:center;">
+            <button class="roll-btn primary" onclick="testLuck()">🍀 Tenter la Chance</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="icon">📊</span> Historique</div>
+        <div class="card-body">
+          <div id="dice-history" style="font-size:13px; color:var(--ink-light); line-height:1.8; min-height:40px;"></div>
+          <button class="roll-btn" onclick="clearHistory()" style="font-size:10px; padding:6px 14px; margin-top:8px; opacity:0.6;">Effacer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ COMBAT PANEL ═══ -->
+    <div class="panel" id="panel-combat">
+      <div class="card">
+        <div class="card-header"><span class="icon">👹</span> Adversaire</div>
+        <div class="card-body">
+          <div class="field-row">
+            <span class="field-label">Nom</span>
+            <input class="field-input" id="enemy-name" type="text" placeholder="Gobelin, Dragon…">
+          </div>
+          <div class="field-row">
+            <span class="field-label">Habileté</span>
+            <input class="field-input" id="enemy-skill" type="number" min="1" max="30" value="7">
+          </div>
+          <div class="field-row">
+            <span class="field-label">Endurance</span>
+            <input class="field-input" id="enemy-stamina" type="number" min="1" max="50" value="10">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="icon">⚔️</span> Round de Combat</div>
+        <div class="card-body">
+          <div style="background:rgba(139,26,26,0.06); border:1px solid rgba(139,26,26,0.15); border-radius:3px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:var(--ink-light); line-height:1.7;">
+            Votre <strong>Force d'Attaque</strong> = 2d6 + Habileté<br>
+            Celle de l'adversaire = 2d6 + son Habileté<br>
+            Différence → dégâts de 2 pts d'Endurance à l'adversaire.<br>
+            Si c'est l'adversaire qui gagne → vous perdez 2 pts.
+          </div>
+          <div class="combat-log" id="combat-log">
+            <div class="log-entry info">⚔ Prêt à combattre…</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+            <button class="roll-btn primary" onclick="combatRound()" style="min-width:140px;">⚔️ Combattre !</button>
+            <button class="roll-btn" onclick="fightLuck()" style="min-width:140px;">🍀 Chance en combat</button>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+            <button class="roll-btn" onclick="resetCombat()" style="font-size:10px; padding:7px 14px; opacity:0.6;">Nouveau combat</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ INVENTORY PANEL ═══ -->
+    <div class="panel" id="panel-inventory">
+      <div class="card">
+        <div class="card-header"><span class="icon">🪙</span> Or</div>
+        <div class="card-body">
+          <div class="gold-display">
+            <button class="stat-btn" onclick="changeGold(-1)">−</button>
+            <span class="gold-coin">🪙</span>
+            <span class="gold-amount" id="gold-val">0</span>
+            <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--ink-light)">PO</span>
+            <button class="stat-btn" onclick="changeGold(+1)">+</button>
+          </div>
+          <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+            <button class="roll-btn" onclick="changeGold(-5)" style="font-size:10px;padding:6px 12px;">−5</button>
+            <button class="roll-btn" onclick="changeGold(-10)" style="font-size:10px;padding:6px 12px;">−10</button>
+            <button class="roll-btn primary" onclick="changeGold(+5)" style="font-size:10px;padding:6px 12px;">+5</button>
+            <button class="roll-btn primary" onclick="changeGold(+10)" style="font-size:10px;padding:6px 12px;">+10</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="icon">🎒</span> Équipement & Objets</div>
+        <div class="card-body">
+          <ul class="item-list" id="item-list"></ul>
+          <div class="add-item-row">
+            <input id="item-input" type="text" placeholder="Nom de l'objet…" onkeydown="if(event.key==='Enter')addItem()">
+            <input id="qty-input" type="number" min="1" max="99" value="1" style="width:52px; padding:8px 6px; background:rgba(240,228,200,0.8); border:1px solid var(--gold-dark); border-radius:3px; font-family:'EB Garamond',serif; font-size:14px; color:var(--ink); outline:none; text-align:center;">
+            <button class="add-btn" onclick="addItem()">Ajouter</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="icon">✨</span> Provisions</div>
+        <div class="card-body">
+          <div style="font-size:13px; color:var(--ink-light); margin-bottom:10px;">
+            Chaque repas restaure 4 points d'Endurance (hors combat).
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Repas</span>
+            <div class="stat-controls">
+              <button class="stat-btn" onclick="changeMeals(-1)">−</button>
+              <span class="stat-value" id="meals-val">10</span>
+              <button class="stat-btn" onclick="changeMeals(+1)">+</button>
+              <button class="roll-btn primary" onclick="eatMeal()" style="font-size:11px; padding:8px 14px; margin-left:4px;">🍖 Manger</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ NOTES PANEL ═══ -->
+    <div class="panel" id="panel-notes">
+      <div class="card">
+        <div class="card-header"><span class="icon">📜</span> Journal d'Aventure</div>
+        <div class="card-body">
+          <textarea class="notes-textarea" id="notes-area" placeholder="Notez vos aventures, passages importants, indices, personnages rencontrés…" oninput="save()"></textarea>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="icon">🗺</span> Numéros de Paragraphes</div>
+        <div class="card-body">
+          <textarea class="notes-textarea" id="para-area" placeholder="Paragraphes visités, chemins explorés…" style="min-height:100px;" oninput="save()"></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── State ───
+let state = {
+  name: '', title: '', book: '',
+  skill: 10, skillMax: 12,
+  stamina: 20, staminaMax: 24,
+  luck: 9, luckMax: 10,
+  gold: 0,
+  meals: 10,
+  potions: 2,
+  potionsTotal: 2,
+  items: [],
+  notes: '', paras: '',
+  diceHistory: []
+};
+
+// ─── Init ───
+function init() {
+  const saved = localStorage.getItem('defi-fantastique-v1');
+  if (saved) try { state = JSON.parse(saved); } catch(e) {}
+  render();
+}
+
+function save() {
+  state.name = document.getElementById('char-name').value;
+  state.title = document.getElementById('char-title').value;
+  state.book = document.getElementById('char-book').value;
+  state.notes = document.getElementById('notes-area').value;
+  state.paras = document.getElementById('para-area').value;
+  localStorage.setItem('defi-fantastique-v1', JSON.stringify(state));
+}
+
+function render() {
+  document.getElementById('char-name').value = state.name;
+  document.getElementById('char-title').value = state.title;
+  document.getElementById('char-book').value = state.book;
+  document.getElementById('notes-area').value = state.notes;
+  document.getElementById('para-area').value = state.paras;
+
+  document.getElementById('skill-val').textContent = state.skill;
+  document.getElementById('stamina-val').textContent = state.stamina;
+  document.getElementById('luck-val').textContent = state.luck;
+  document.getElementById('skill-max').textContent = state.skillMax;
+  document.getElementById('stamina-max').textContent = state.staminaMax;
+  document.getElementById('luck-max').textContent = state.luckMax;
+  document.getElementById('skill-max-in').value = state.skillMax;
+  document.getElementById('stamina-max-in').value = state.staminaMax;
+  document.getElementById('luck-max-in').value = state.luckMax;
+
+  // HP bar
+  const pct = Math.max(0, Math.min(100, Math.round(state.stamina / state.staminaMax * 100)));
+  const bar = document.getElementById('hp-bar');
+  bar.style.width = pct + '%';
+  bar.style.background = pct > 50
+    ? `linear-gradient(90deg, #2d8a58, #5aab3a)`
+    : pct > 25
+      ? `linear-gradient(90deg, #c9a84c, #e8c96b)`
+      : `linear-gradient(90deg, #8b1a1a, #c9453a)`;
+
+  document.getElementById('gold-val').textContent = state.gold;
+  document.getElementById('meals-val').textContent = state.meals;
+
+  // Potions
+  const pip = document.getElementById('potion-pips');
+  pip.innerHTML = '';
+  for (let i = 0; i < state.potionsTotal; i++) {
+    const d = document.createElement('div');
+    d.className = 'potion-pip ' + (i < state.potions ? 'full' : 'used');
+    d.title = i < state.potions ? 'Potion disponible' : 'Utilisée';
+    pip.appendChild(d);
+  }
+
+  // Items
+  const list = document.getElementById('item-list');
+  list.innerHTML = state.items.length === 0
+    ? '<li style="color:var(--ink-light);font-size:13px;font-style:italic;padding:8px 0;">Aucun objet…</li>'
+    : '';
+  state.items.forEach((item, i) => {
+    const li = document.createElement('li');
+    li.className = 'item-entry';
+    li.innerHTML = `
+      <span class="item-icon">${itemIcon(item.name)}</span>
+      <span class="item-name">${esc(item.name)}</span>
+      ${item.qty > 1 ? `<span class="item-qty">×${item.qty}</span>` : ''}
+      <button class="item-del" onclick="removeItem(${i})">✕</button>
+    `;
+    list.appendChild(li);
+  });
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function itemIcon(name) {
+  const n = name.toLowerCase();
+  if (/épée|sabre|lame|dague|couteau|hache|massue|arme/.test(n)) return '⚔️';
+  if (/bouclier|armure|casque|cuirasse/.test(n)) return '🛡';
+  if (/potion|fiole|élixir|remède/.test(n)) return '🧪';
+  if (/livre|parchemin|carte|lettre|note/.test(n)) return '📜';
+  if (/clé|clef/.test(n)) return '🗝';
+  if (/lampe|torche|lanterne/.test(n)) return '🕯';
+  if (/corde/.test(n)) return '🪢';
+  if (/flèche|arc/.test(n)) return '🏹';
+  if (/anneau|bague|amulette/.test(n)) return '💍';
+  if (/or|pièce|monnaie/.test(n)) return '🪙';
+  return '🎒';
+}
+
+// ─── Stats ───
+function changeStat(stat, delta) {
+  const maxKey = stat + 'Max';
+  state[stat] = Math.max(0, Math.min(state[maxKey], state[stat] + delta));
+  render(); save();
+  if (stat === 'stamina' && state.stamina === 0) toast('💀 Votre personnage est mort !');
+}
+
+function setMax(stat) {
+  const v = parseInt(document.getElementById(stat+'-max-in').value) || 1;
+  state[stat+'Max'] = v;
+  if (state[stat] > v) state[stat] = v;
+  render(); save();
+}
+
+// ─── Potions ───
+function addPotion() { state.potionsTotal++; state.potions++; render(); save(); }
+function removePotion() {
+  if (state.potionsTotal > 0) {
+    if (state.potions >= state.potionsTotal) state.potions--;
+    state.potionsTotal--;
+    render(); save();
+  }
+}
+function drinkPotion() {
+  if (state.potions <= 0) { toast('Plus de potion !'); return; }
+  state.potions--;
+  state.stamina = state.staminaMax;
+  render(); save();
+  toast('🧪 Endurance restaurée à ' + state.staminaMax + ' !');
+}
+
+// ─── Gold / Meals ───
+function changeGold(d) { state.gold = Math.max(0, state.gold + d); render(); save(); }
+function changeMeals(d) { state.meals = Math.max(0, state.meals + d); render(); save(); }
+function eatMeal() {
+  if (state.meals <= 0) { toast('Plus de provisions !'); return; }
+  state.meals--;
+  const gain = Math.min(4, state.staminaMax - state.stamina);
+  state.stamina = Math.min(state.staminaMax, state.stamina + 4);
+  render(); save();
+  toast('🍖 +' + gain + ' Endurance (total : ' + state.stamina + ')');
+}
+
+// ─── Items ───
+function addItem() {
+  const input = document.getElementById('item-input');
+  const qtyIn = document.getElementById('qty-input');
+  const name = input.value.trim();
+  if (!name) return;
+  const qty = parseInt(qtyIn.value) || 1;
+  const existing = state.items.find(i => i.name.toLowerCase() === name.toLowerCase());
+  if (existing) { existing.qty += qty; }
+  else { state.items.push({ name, qty }); }
+  input.value = ''; qtyIn.value = 1;
+  render(); save();
+}
+function removeItem(i) { state.items.splice(i, 1); render(); save(); }
+
+// ─── Dice ───
+function d6() { return Math.floor(Math.random() * 6) + 1; }
+
+function rollDice(n) {
+  const dice = Array.from({length:n}, d6);
+  const total = dice.reduce((a,b)=>a+b,0);
+
+  const d1El = document.getElementById('die1');
+  const d2El = document.getElementById('die2');
+  d1El.classList.add('rolling'); d2El.classList.add('rolling');
+  setTimeout(() => {
+    d1El.textContent = dice[0];
+    d2El.textContent = n > 1 ? dice[1] : '–';
+    document.getElementById('dice-total').textContent = total;
+    document.getElementById('dice-label').textContent = n === 2 ? 'Total (2d6)' : '1d6';
+    d1El.classList.remove('rolling'); d2El.classList.remove('rolling');
+  }, 500);
+
+  const entry = `🎲 ${n}d6 → [${dice.join(', ')}] = <strong>${total}</strong>`;
+  addHistory(entry);
+  return { dice, total };
+}
+
+function testLuck() {
+  const roll = d6() + d6();
+  const lucky = roll <= state.luck;
+  const old = state.luck;
+  state.luck = Math.max(0, state.luck - 1);
+
+  const el = document.getElementById('luck-result');
+  if (lucky) {
+    el.textContent = '✨ CHANCEUX !';
+    el.style.color = '#1a5c3a';
+  } else {
+    el.textContent = '💀 MALCHANCEUX…';
+    el.style.color = '#8b1a1a';
+  }
+
+  addHistory(`🍀 Chance: ${roll} vs ${old} → ${lucky ? 'Chanceux ✨' : 'Malchanceux 💀'}`);
+  render(); save();
+}
+
+function addHistory(entry) {
+  state.diceHistory.unshift(entry);
+  if (state.diceHistory.length > 20) state.diceHistory.pop();
+  document.getElementById('dice-history').innerHTML = state.diceHistory.slice(0,10).map(e => `<div>${e}</div>`).join('');
+}
+
+function clearHistory() {
+  state.diceHistory = [];
+  document.getElementById('dice-history').innerHTML = '';
+}
+
+// ─── Combat ───
+let combatEnemyStamina = 0;
+
+function combatRound() {
+  const enemyName = document.getElementById('enemy-name').value || 'Adversaire';
+  const enemySkill = parseInt(document.getElementById('enemy-skill').value) || 7;
+  if (combatEnemyStamina === 0) {
+    combatEnemyStamina = parseInt(document.getElementById('enemy-stamina').value) || 10;
+  }
+
+  if (state.stamina <= 0) { addLog('💀 Vous êtes mort.', 'dmg'); return; }
+  if (combatEnemyStamina <= 0) { addLog('🏆 Adversaire déjà vaincu !', 'info'); return; }
+
+  const heroRoll = d6() + d6();
+  const enemyRoll = d6() + d6();
+  const heroFA = heroRoll + state.skill;
+  const enemyFA = enemyRoll + enemySkill;
+
+  addLog(`⚔ Votre FA : ${heroRoll} + ${state.skill} = ${heroFA} | ${enemyName} FA : ${enemyRoll} + ${enemySkill} = ${enemyFA}`, 'info');
+
+  if (heroFA > enemyFA) {
+    combatEnemyStamina -= 2;
+    if (combatEnemyStamina < 0) combatEnemyStamina = 0;
+    addLog(`✅ Vous touchez ${enemyName} ! (End. restante : ${combatEnemyStamina})`, 'miss');
+    if (combatEnemyStamina <= 0) {
+      addLog(`🏆 ${enemyName} est vaincu !`, 'heal');
+      toast('🏆 Victoire ! ' + enemyName + ' est vaincu !');
+    }
+  } else if (enemyFA > heroFA) {
+    state.stamina = Math.max(0, state.stamina - 2);
+    addLog(`❌ ${enemyName} vous blesse ! (Votre End. : ${state.stamina})`, 'hit');
+    if (state.stamina <= 0) {
+      addLog(`💀 Vous êtes mort…`, 'dmg');
+      toast('💀 Vous avez péri au combat !');
+    }
+    render(); save();
+  } else {
+    addLog(`🔄 Égalité ! Les deux combattants esquivent.`, 'info');
+  }
+}
+
+function fightLuck() {
+  const roll = d6() + d6();
+  const lucky = roll <= state.luck;
+  state.luck = Math.max(0, state.luck - 1);
+  const enemyName = document.getElementById('enemy-name').value || 'Adversaire';
+
+  if (lucky) {
+    combatEnemyStamina = Math.max(0, combatEnemyStamina - 2);
+    addLog(`🍀 Chanceux ! ${enemyName} subit 2 dégâts supplémentaires. (End. : ${combatEnemyStamina})`, 'heal');
+  } else {
+    state.stamina = Math.max(0, state.stamina - 1);
+    addLog(`💀 Malchanceux ! Vous subissez 1 dégât. (Votre End. : ${state.stamina})`, 'hit');
+  }
+  render(); save();
+}
+
+function addLog(msg, cls) {
+  const log = document.getElementById('combat-log');
+  const div = document.createElement('div');
+  div.className = 'log-entry ' + (cls || '');
+  div.innerHTML = msg;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function resetCombat() {
+  combatEnemyStamina = 0;
+  document.getElementById('combat-log').innerHTML = '<div class="log-entry info">⚔ Prêt à combattre…</div>';
+  document.getElementById('enemy-stamina').value = '10';
+}
+
+// ─── Nav ───
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  const tabs = ['stats','dice','combat','inventory','notes'];
+  const i = tabs.indexOf(id);
+  document.querySelectorAll('.nav-tab')[i].classList.add('active');
+}
+
+// ─── Toast ───
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ─── Reset ───
+function resetConfirm() {
+  if (confirm('Effacer toute la partie et recommencer à zéro ?')) {
+    localStorage.removeItem('defi-fantastique-v1');
+    state = { name:'',title:'',book:'',skill:10,skillMax:12,stamina:20,staminaMax:24,luck:9,luckMax:10,gold:0,meals:10,potions:2,potionsTotal:2,items:[],notes:'',paras:'',diceHistory:[] };
+    render();
+    document.getElementById('combat-log').innerHTML = '<div class="log-entry info">⚔ Prêt à combattre…</div>';
+    toast('Nouvelle aventure commence !');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
