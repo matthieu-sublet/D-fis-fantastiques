@@ -391,29 +391,53 @@
             <h2>Équipement de Départ</h2>
           </div>
           <div class="rule-box">
-            Tout aventurier commence avec un équipement standard. Choisissez votre type de départ, puis votre or de départ est déterminé par un jet de dé.
+            <strong>Équipement standard (règles officielles)</strong><br>
+            Chaque aventurier débute avec un équipement identique, fixé par les règles de la série. Il n'y a pas de choix de classe ou de profil dans les livres Défi Fantastique.
           </div>
 
-          <div class="equip-choice" id="equip-choices">
-            <div class="equip-opt selected" data-equip="guerrier" onclick="selectEquip(this)">
-              <div class="opt-title">⚔️ Guerrier</div>
-              <div class="opt-items">Épée, bouclier en cuir, lanterne + huile, sac à dos, 10 provisions, corde (5m)</div>
-            </div>
-            <div class="equip-opt" data-equip="archer" onclick="selectEquip(this)">
-              <div class="opt-title">🏹 Rôdeur</div>
-              <div class="opt-items">Épée courte, arc + 8 flèches, carquois, lanterne, sac à dos, 8 provisions</div>
-            </div>
-            <div class="equip-opt" data-equip="mage" onclick="selectEquip(this)">
-              <div class="opt-title">✨ Aventurier Érudit</div>
-              <div class="opt-items">Dague, bâton, livre de sorts vierge, lanterne, sac à dos, 8 provisions, parchemin vierge</div>
+          <!-- Équipement fixe -->
+          <div style="background:rgba(26,15,0,.06);border:1px solid rgba(201,168,76,.3);border-radius:4px;padding:12px 14px;margin-bottom:14px;">
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:10px;">📦 Votre sac à dos contient</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink);">
+              <div>⚔️ &nbsp;Une épée</div>
+              <div>🛡 &nbsp;Une armure de cuir</div>
+              <div>🕯 &nbsp;Une lanterne</div>
+              <div>🎒 &nbsp;Un sac à dos</div>
+              <div>🍖 &nbsp;10 provisions de voyage</div>
             </div>
           </div>
 
-          <div class="roll-result-big" style="margin-top:14px;">
-            <div class="formula">Or de départ : 1d6 × 10 PO</div>
+          <!-- Choix de potion -->
+          <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:8px;">🧪 Choisissez votre potion magique</div>
+          <div class="rule-box" style="margin-bottom:10px;">
+            Vous avez droit à <strong>une seule potion</strong>, à choisir parmi les trois ci-dessous. Elle restaure la caractéristique concernée à sa valeur initiale.
+          </div>
+          <div class="equip-choice" id="potion-choices">
+            <div class="equip-opt selected" data-potion="skill" onclick="selectPotion(this)">
+              <div class="opt-title">⚔️ Potion d'Habileté</div>
+              <div class="opt-items">Restaure votre Habileté à sa valeur initiale. Utile si vous avez subi des malus en combat.</div>
+            </div>
+            <div class="equip-opt" data-potion="stamina" onclick="selectPotion(this)">
+              <div class="opt-title">❤️ Potion d'Endurance</div>
+              <div class="opt-items">Restaure votre Endurance à sa valeur initiale. Le choix le plus populaire pour survivre plus longtemps.</div>
+            </div>
+            <div class="equip-opt" data-potion="luck" onclick="selectPotion(this)">
+              <div class="opt-title">🍀 Potion de Chance</div>
+              <div class="opt-items">Restaure votre Chance à sa valeur initiale et l'augmente de 1 point en prime.</div>
+            </div>
+          </div>
+
+          <!-- Or -->
+          <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin:14px 0 8px;">🪙 Or de départ — 2d6 + 3 Pièces d'Or</div>
+          <div class="rule-box" style="margin-bottom:10px;">
+            Le montant d'or varie selon les livres. En règle générale, on lance <strong>2d6 + 3</strong> pour obtenir entre 5 et 15 PO.
+          </div>
+          <div class="roll-result-big">
+            <div class="formula">2d6 + 3</div>
             <div class="dice-row">
-              <div class="d" id="wiz-d-gold">?</div>
-              <div class="d" style="background:rgba(26,15,0,.2);border-color:rgba(201,168,76,.2);color:rgba(201,168,76,.35);">×10</div>
+              <div class="d" id="wiz-d-gold1">?</div>
+              <div class="d" id="wiz-d-gold2">?</div>
+              <div class="d" style="background:rgba(26,15,0,.2);border-color:rgba(201,168,76,.2);color:rgba(201,168,76,.35);">+3</div>
             </div>
             <div class="total" id="wiz-gold-roll" style="color:var(--gold-dark);">–</div>
             <div class="bonus" id="wiz-gold-label">Pièces d'or</div>
@@ -911,7 +935,7 @@ function wizGo(step) {
   }
   else if(step===5) {
     btnRoll.style.display = wiz.goldRolled?'none':'block';
-    btnRoll.textContent='🎲 Lancer l\'or (1d6×10)';
+    btnRoll.textContent='🎲 Lancer l\'or (2d6+3)';
     btnNext.style.display = wiz.goldRolled?'block':'none';
     btnNext.textContent='Voir le résumé →';
   }
@@ -1024,38 +1048,56 @@ function rollLuck() {
 }
 
 function rollGold() {
-  const r=d6(); const total=r*10;
-  animDie('wiz-d-gold',r,0,()=>{
-    document.getElementById('wiz-gold-roll').textContent=total;
-    document.getElementById('wiz-gold-label').textContent=total+' Pièces d\'Or';
-    wiz.gold=total;
-    wiz.goldRolled=true;
-    document.getElementById('btn-roll').style.display='none';
-    document.getElementById('btn-next').style.display='block';
-    document.getElementById('btn-next').textContent='Voir le résumé →';
+  const r1=d6(), r2=d6(); const total=r1+r2+3;
+  animDie('wiz-d-gold1',r1,0,()=>{
+    animDie('wiz-d-gold2',r2,0,()=>{
+      document.getElementById('wiz-gold-roll').textContent=total;
+      document.getElementById('wiz-gold-label').textContent=total+' Pièces d\'Or';
+      wiz.gold=total;
+      wiz.goldRolled=true;
+      document.getElementById('btn-roll').style.display='none';
+      document.getElementById('btn-next').style.display='block';
+      document.getElementById('btn-next').textContent='Voir le résumé →';
+    });
   });
 }
 
-function selectEquip(el) {
-  document.querySelectorAll('.equip-opt').forEach(o=>o.classList.remove('selected'));
+// ══ POTION CHOICE ══
+const POTION_TYPES = {
+  skill:   { label: 'Potion d\'Habileté',  icon: '⚔️' },
+  stamina: { label: 'Potion d\'Endurance', icon: '❤️' },
+  luck:    { label: 'Potion de Chance',    icon: '🍀' }
+};
+
+function selectPotion(el) {
+  document.querySelectorAll('#potion-choices .equip-opt').forEach(o=>o.classList.remove('selected'));
   el.classList.add('selected');
-  wiz.equip = el.dataset.equip;
+  wiz.potion = el.dataset.potion;
 }
 
 function buildSummary() {
-  const eq = EQUIP_SETS[wiz.equip];
+  const pt = POTION_TYPES[wiz.potion || 'stamina'];
   document.getElementById('sum-skill').textContent = wiz.skill;
   document.getElementById('sum-stamina').textContent = wiz.stamina;
   document.getElementById('sum-luck').textContent = wiz.luck;
   document.getElementById('sum-name').textContent = wiz.name;
   document.getElementById('sum-book').textContent = wiz.book;
-  document.getElementById('sum-equip').textContent = eq.label+' — '+eq.items.map(i=>i.qty>1?i.name+' ×'+i.qty:i.name).join(', ');
+  document.getElementById('sum-equip').textContent = 'Épée, armure de cuir, lanterne, sac à dos';
   document.getElementById('sum-gold').textContent = wiz.gold+' PO';
-  document.getElementById('sum-meals').textContent = eq.meals+' provisions';
+  document.getElementById('sum-meals').textContent = '10 provisions';
+  document.getElementById('sum-potion').textContent = pt.icon+' '+pt.label;
 }
 
 function wizFinish() {
-  const eq = EQUIP_SETS[wiz.equip];
+  const pt = POTION_TYPES[wiz.potion || 'stamina'];
+  const potionItem = { name: pt.label, qty: 1 };
+  const baseItems = [
+    {name:'Épée', qty:1},
+    {name:'Armure de cuir', qty:1},
+    {name:'Lanterne', qty:1},
+    {name:'Sac à dos', qty:1},
+    potionItem
+  ];
   state = {
     name: wiz.name,
     book: wiz.book,
@@ -1063,9 +1105,10 @@ function wizFinish() {
     stamina: wiz.stamina, staminaMax: wiz.stamina,
     luck: wiz.luck, luckMax: wiz.luck,
     gold: wiz.gold,
-    meals: eq.meals,
+    meals: 10,
     potions: 1, potionsTotal: 1,
-    items: JSON.parse(JSON.stringify(eq.items)),
+    potionType: wiz.potion || 'stamina',
+    items: baseItems,
     notes: '', paras: '',
     diceHistory: []
   };
@@ -1078,7 +1121,7 @@ function wizFinish() {
 function reopenWizard() {
   if(!confirm('Créer un nouveau personnage ? La fiche actuelle sera effacée.')) return;
   localStorage.removeItem('defi-fantastique-v2');
-  wiz = {step:0,name:'',book:'',skill:null,skillRolled:false,stamina:null,staminaRolled:false,luck:null,luckRolled:false,gold:null,goldRolled:false,equip:'guerrier'};
+  wiz = {step:0,name:'',book:'',skill:null,skillRolled:false,stamina:null,staminaRolled:false,luck:null,luckRolled:false,gold:null,goldRolled:false,potion:'stamina'};
   // Reset wizard UI
   document.getElementById('wiz-skill-roll').textContent='–';
   document.getElementById('wiz-d-skill').textContent='?';
@@ -1088,7 +1131,8 @@ function reopenWizard() {
   document.getElementById('wiz-luck-roll').textContent='–';
   document.getElementById('wiz-d-luck').textContent='?';
   document.getElementById('wiz-gold-roll').textContent='–';
-  document.getElementById('wiz-d-gold').textContent='?';
+  document.getElementById('wiz-d-gold1').textContent='?';
+  document.getElementById('wiz-d-gold2').textContent='?';
   document.getElementById('wiz-gold-label').textContent='Pièces d\'or';
   document.getElementById('wiz-skill-reroll-hint').style.display='none';
   document.getElementById('wiz-stamina-reroll-hint').style.display='none';
@@ -1098,7 +1142,7 @@ function reopenWizard() {
   document.getElementById('book-search').value='';
   document.getElementById('name-suggestions').innerHTML='';
   selectedBookIdx=-1;
-  document.querySelectorAll('.equip-opt').forEach((o,i)=>o.classList.toggle('selected',i===0));
+  document.querySelectorAll('#potion-choices .equip-opt').forEach((o,i)=>o.classList.toggle('selected',i===1));
   document.getElementById('wizard').style.display='flex';
   wizGo(0);
   initWizardUI();
@@ -1113,8 +1157,15 @@ function changeStat(stat,delta){
 }
 function addPotion(){state.potionsTotal++;state.potions++;render();save();}
 function removePotion(){if(state.potionsTotal>0){if(state.potions>=state.potionsTotal)state.potions--;state.potionsTotal--;render();save();}}
-function drinkPotion(){if(state.potions<=0){toast('Plus de potion !');return;}state.potions--;state.stamina=state.staminaMax;render();save();toast('🧪 Endurance restaurée à '+state.staminaMax+' !');}
-function changeGold(d){state.gold=Math.max(0,state.gold+d);render();save();}
+function drinkPotion(){
+  if(state.potions<=0){toast('Plus de potion !');return;}
+  state.potions--;
+  const pt = state.potionType || 'stamina';
+  if(pt==='stamina'){ state.stamina=state.staminaMax; toast('❤️ Endurance restaurée à '+state.staminaMax+' !'); }
+  else if(pt==='skill'){ state.skill=state.skillMax; toast('⚔️ Habileté restaurée à '+state.skillMax+' !'); }
+  else if(pt==='luck'){ state.luck=Math.min(state.luckMax+1, state.luckMax+1); state.luckMax=state.luckMax+1; state.luck=state.luckMax; toast('🍀 Chance restaurée à '+state.luck+' (et +1 max) !'); }
+  render();save();
+}function changeGold(d){state.gold=Math.max(0,state.gold+d);render();save();}
 function changeMeals(d){state.meals=Math.max(0,state.meals+d);render();save();}
 function eatMeal(){if(state.meals<=0){toast('Plus de provisions !');return;}state.meals--;const gain=Math.min(4,state.staminaMax-state.stamina);state.stamina=Math.min(state.staminaMax,state.stamina+4);render();save();toast('🍖 +'+gain+' Endurance (total : '+state.stamina+')');}
 function addItem(){const input=document.getElementById('item-input');const qtyIn=document.getElementById('qty-input');const name=input.value.trim();if(!name)return;const qty=parseInt(qtyIn.value)||1;const existing=state.items.find(i=>i.name.toLowerCase()===name.toLowerCase());if(existing){existing.qty+=qty;}else{state.items.push({name,qty});}input.value='';qtyIn.value=1;render();save();}
