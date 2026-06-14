@@ -6,586 +6,442 @@
 <title>Défi Fantastique – Fiche de Personnage</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
-
   :root {
-    --parchment: #f2e8d0;
-    --parchment-dark: #e0ceaa;
-    --ink: #1a0f00;
-    --ink-light: #3d2b0f;
-    --blood: #8b1a1a;
-    --blood-dark: #5c0e0e;
-    --gold: #c9a84c;
-    --gold-light: #e8c96b;
-    --gold-dark: #8a6520;
-    --emerald: #1a5c3a;
-    --emerald-light: #2d8a58;
-    --shadow: rgba(26,15,0,0.35);
-    --section-bg: rgba(240,228,200,0.6);
+    --parchment:#f2e8d0;--parchment-dark:#e0ceaa;--ink:#1a0f00;--ink-light:#3d2b0f;
+    --blood:#8b1a1a;--blood-dark:#5c0e0e;--gold:#c9a84c;--gold-light:#e8c96b;
+    --gold-dark:#8a6520;--emerald:#1a5c3a;--emerald-light:#2d8a58;
+    --shadow:rgba(26,15,0,0.35);--section-bg:rgba(240,228,200,0.6);
   }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'EB Garamond',serif;background:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(139,26,26,.15) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(201,168,76,.1) 0%,transparent 50%);pointer-events:none;z-index:0;}
+  .app{position:relative;z-index:1;width:100%;max-width:480px;min-height:100vh;background:var(--parchment);box-shadow:0 0 60px rgba(0,0,0,.8);display:flex;flex-direction:column;}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* ── WIZARD OVERLAY ── */
+  #wizard{position:fixed;inset:0;z-index:200;background:rgba(10,5,0,.92);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;}
+  .wiz-box{width:100%;max-width:480px;min-height:100vh;background:var(--parchment);display:flex;flex-direction:column;}
+  .wiz-header{background:linear-gradient(180deg,#1a0a00 0%,#2d1500 60%,#1a0a00 100%);border-bottom:3px solid var(--gold);padding:20px 16px 16px;text-align:center;position:relative;}
+  .wiz-header::before{content:'✦';position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--gold);opacity:.6;}
+  .wiz-header::after{content:'✦';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--gold);opacity:.6;}
+  .wiz-title{font-family:'Cinzel Decorative',cursive;font-size:14px;color:var(--gold-light);letter-spacing:3px;margin-bottom:4px;}
+  .wiz-sub{font-family:'Cinzel',serif;font-size:10px;color:var(--parchment-dark);letter-spacing:2px;opacity:.7;}
 
-  body {
-    font-family: 'EB Garamond', serif;
-    background: var(--ink);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+  .wiz-progress{display:flex;background:#120800;border-bottom:2px solid var(--gold-dark);padding:0;}
+  .wiz-step-dot{flex:1;padding:8px 2px;text-align:center;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.5px;color:rgba(240,220,180,.35);text-transform:uppercase;border-right:1px solid rgba(201,168,76,.1);transition:all .3s;position:relative;}
+  .wiz-step-dot:last-child{border-right:none;}
+  .wiz-step-dot.done{color:var(--gold-dark);}
+  .wiz-step-dot.active{color:var(--gold-light);background:rgba(201,168,76,.1);}
+  .wiz-step-dot .dot{display:block;width:6px;height:6px;border-radius:50%;background:rgba(201,168,76,.2);margin:0 auto 4px;}
+  .wiz-step-dot.done .dot{background:var(--gold-dark);}
+  .wiz-step-dot.active .dot{background:var(--gold-light);box-shadow:0 0 6px rgba(232,201,107,.5);}
 
-  /* ─── Background texture ─── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background:
-      radial-gradient(ellipse at 20% 20%, rgba(139,26,26,0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(201,168,76,0.1) 0%, transparent 50%),
-      url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
+  .wiz-content{flex:1;padding:18px 16px;overflow-y:auto;}
+  .wiz-screen{display:none;animation:fadeIn .3s ease;}
+  .wiz-screen.active{display:block;}
 
-  .app {
-    position: relative; z-index: 1;
-    width: 100%; max-width: 480px;
-    min-height: 100vh;
-    background: var(--parchment);
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
-    box-shadow: 0 0 60px rgba(0,0,0,0.8);
-    display: flex;
-    flex-direction: column;
-  }
+  .wiz-intro{text-align:center;padding:10px 0 16px;}
+  .wiz-intro-icon{font-size:52px;margin-bottom:12px;}
+  .wiz-intro h2{font-family:'Cinzel Decorative',cursive;font-size:16px;color:var(--ink);margin-bottom:10px;}
+  .wiz-intro p{font-size:15px;color:var(--ink-light);line-height:1.7;margin-bottom:8px;}
 
-  /* ─── Header ─── */
-  .header {
-    background: linear-gradient(180deg, #1a0a00 0%, #2d1500 60%, #1a0a00 100%);
-    border-bottom: 3px solid var(--gold);
-    padding: 18px 16px 14px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '⚔';
-    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-    font-size: 22px; opacity: 0.6; color: var(--gold);
-  }
-  .header::after {
-    content: '⚔';
-    position: absolute; right: 16px; top: 50%; transform: translateY(-50%) scaleX(-1);
-    font-size: 22px; opacity: 0.6; color: var(--gold);
-  }
-  .header-title {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 13px;
-    color: var(--gold-light);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .header-sub {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    color: var(--parchment-dark);
-    letter-spacing: 2px;
-    opacity: 0.7;
-  }
+  .rule-box{background:rgba(26,15,0,.06);border:1px solid rgba(201,168,76,.35);border-radius:4px;padding:12px 14px;margin:12px 0;font-size:14px;color:var(--ink-light);line-height:1.75;}
+  .rule-box strong{color:var(--ink);font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;}
 
-  /* ─── Nav tabs ─── */
-  .nav {
-    display: flex;
-    background: #120800;
-    border-bottom: 2px solid var(--gold-dark);
-  }
-  .nav-tab {
-    flex: 1;
-    padding: 10px 4px;
-    text-align: center;
-    cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: var(--parchment-dark);
-    text-transform: uppercase;
-    border-right: 1px solid rgba(201,168,76,0.2);
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .nav-tab:last-child { border-right: none; }
-  .nav-tab.active {
-    background: linear-gradient(180deg, rgba(201,168,76,0.2) 0%, rgba(201,168,76,0.05) 100%);
-    color: var(--gold-light);
-    border-bottom: 2px solid var(--gold);
-    margin-bottom: -2px;
-  }
-  .nav-tab .tab-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+  .roll-result-big{text-align:center;margin:16px 0;}
+  .roll-result-big .formula{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--ink-light);text-transform:uppercase;margin-bottom:6px;}
+  .roll-result-big .dice-row{display:flex;justify-content:center;gap:10px;margin-bottom:10px;}
+  .roll-result-big .d{width:50px;height:50px;background:linear-gradient(135deg,#2d1500,#1a0a00);border:2px solid var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Cinzel Decorative',cursive;font-size:22px;color:var(--gold-light);box-shadow:0 3px 10px rgba(0,0,0,.35);}
+  .roll-result-big .d.rolling{animation:shake .5s ease;}
+  .roll-result-big .total{font-family:'Cinzel Decorative',cursive;font-size:42px;color:var(--ink);line-height:1;}
+  .roll-result-big .bonus{font-family:'Cinzel',serif;font-size:13px;color:var(--ink-light);margin-top:4px;}
+  .roll-result-big .final{font-family:'Cinzel Decorative',cursive;font-size:28px;color:var(--blood-dark);margin-top:2px;}
 
-  /* ─── Content ─── */
-  .content { flex: 1; overflow-y: auto; padding: 16px; }
-  .panel { display: none; animation: fadeIn 0.3s ease; }
-  .panel.active { display: block; }
+  .stat-preview{display:flex;gap:10px;margin:14px 0;}
+  .stat-chip{flex:1;text-align:center;background:rgba(26,15,0,.07);border:1px solid rgba(201,168,76,.3);border-radius:4px;padding:10px 6px;}
+  .stat-chip .sc-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:4px;}
+  .stat-chip .sc-val{font-family:'Cinzel Decorative',cursive;font-size:28px;color:var(--ink);}
+  .stat-chip.rolled{border-color:var(--gold);background:rgba(201,168,76,.1);}
 
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  /* Equipment choice */
+  .equip-choice{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+  .equip-opt{padding:12px 14px;border:1.5px solid rgba(201,168,76,.3);border-radius:4px;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;font-size:14px;color:var(--ink);line-height:1.5;}
+  .equip-opt:active{transform:scale(.98);}
+  .equip-opt.selected{border-color:var(--gold);background:rgba(201,168,76,.15);box-shadow:0 0 0 1px var(--gold-dark);}
+  .equip-opt .opt-title{font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:3px;}
+  .equip-opt .opt-items{font-size:13px;color:var(--ink-light);}
 
-  /* ─── Section card ─── */
-  .card {
-    background: var(--section-bg);
-    border: 1px solid rgba(201,168,76,0.4);
-    border-radius: 4px;
-    margin-bottom: 14px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(26,15,0,0.12), inset 0 1px 0 rgba(255,255,255,0.3);
-  }
-  .card-header {
-    background: linear-gradient(90deg, rgba(26,15,0,0.85) 0%, rgba(61,43,15,0.85) 100%);
-    padding: 8px 14px;
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--gold-light);
-    text-transform: uppercase;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .card-header .icon { font-size: 14px; }
-  .card-body { padding: 14px; }
+  /* Summary */
+  .summary-table{width:100%;border-collapse:collapse;margin:10px 0;}
+  .summary-table td{padding:8px 10px;border-bottom:1px solid rgba(201,168,76,.2);font-size:14px;vertical-align:top;}
+  .summary-table td:first-child{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);width:110px;}
+  .summary-table td:last-child{color:var(--ink);font-weight:500;}
 
-  /* ─── Stat block ─── */
-  .stat-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-  .stat-label {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    width: 90px;
-    flex-shrink: 0;
-  }
-  .stat-controls {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-  }
-  .stat-btn {
-    width: 34px; height: 34px;
-    border: 1.5px solid var(--gold-dark);
-    background: linear-gradient(180deg, #2d1500 0%, #1a0a00 100%);
-    color: var(--gold-light);
-    font-size: 18px;
-    cursor: pointer;
-    border-radius: 3px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Cinzel', serif;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-    flex-shrink: 0;
-  }
-  .stat-btn:active { transform: scale(0.93); background: linear-gradient(180deg, #4a2200 0%, #2d1500 100%); }
-  .stat-value {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 26px;
-    color: var(--ink);
-    min-width: 44px;
-    text-align: center;
-    line-height: 1;
-  }
-  .stat-max {
-    font-family: 'EB Garamond', serif;
-    font-size: 13px;
-    color: var(--ink-light);
-    opacity: 0.6;
-  }
+  /* Buttons */
+  .wiz-footer{padding:14px 16px;border-top:1px solid rgba(201,168,76,.25);display:flex;gap:10px;}
+  .btn-wiz{flex:1;padding:13px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;border-radius:4px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+  .btn-wiz-back{background:rgba(26,15,0,.08);border:1.5px solid rgba(26,15,0,.2);color:var(--ink-light);}
+  .btn-wiz-next{background:linear-gradient(180deg,#2d5a1a,#1a3a0e);border:1.5px solid #5aab3a;color:var(--parchment);}
+  .btn-wiz-roll{background:linear-gradient(180deg,#8b1a1a,#5c0e0e);border:1.5px solid #c9453a;color:var(--parchment);}
+  .btn-wiz-finish{background:linear-gradient(180deg,var(--gold-dark),#5a3f0a);border:1.5px solid var(--gold);color:var(--parchment);}
+  .btn-wiz:active{transform:scale(.96);}
+  .btn-wiz:disabled{opacity:.35;pointer-events:none;}
 
-  /* HP bar */
-  .hp-bar-wrap {
-    flex: 1;
-    height: 10px;
-    background: rgba(26,15,0,0.15);
-    border-radius: 5px;
-    overflow: hidden;
-    border: 1px solid rgba(26,15,0,0.2);
-  }
-  .hp-bar {
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.4s ease, background 0.4s ease;
-  }
+  .name-input{width:100%;padding:12px 14px;background:rgba(240,228,200,.8);border:1.5px solid var(--gold-dark);border-radius:4px;font-family:'EB Garamond',serif;font-size:18px;color:var(--ink);outline:none;margin:10px 0;}
+  .name-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.2);}
+  .book-input{font-size:15px;padding:10px 14px;}
 
-  /* ─── Dice section ─── */
-  .dice-area { text-align: center; }
-  .dice-results {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .die-face {
-    width: 64px; height: 64px;
-    background: linear-gradient(135deg, #2d1500 0%, #1a0a00 100%);
-    border: 2px solid var(--gold);
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 28px;
-    color: var(--gold-light);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,168,76,0.2);
-    transition: transform 0.15s;
-  }
-  .die-face.rolling { animation: shake 0.5s ease; }
-  @keyframes shake {
-    0%,100% { transform: rotate(0deg) scale(1); }
-    20% { transform: rotate(-12deg) scale(1.1); }
-    40% { transform: rotate(10deg) scale(1.1); }
-    60% { transform: rotate(-8deg) scale(1.05); }
-    80% { transform: rotate(6deg) scale(1.05); }
-  }
-  .dice-total {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 36px;
-    color: var(--ink);
-    margin: 8px 0 4px;
-  }
-  .dice-label {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    opacity: 0.7;
-    margin-bottom: 16px;
-  }
-  .dice-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .roll-btn {
-    padding: 11px 20px;
-    background: linear-gradient(180deg, #8b1a1a 0%, #5c0e0e 100%);
-    border: 1.5px solid #c9453a;
-    color: var(--parchment);
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: all 0.15s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .roll-btn:active { transform: scale(0.95); filter: brightness(1.2); }
-  .roll-btn.primary {
-    background: linear-gradient(180deg, #2d5a1a 0%, #1a3a0e 100%);
-    border-color: #5aab3a;
-  }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  @keyframes shake{0%,100%{transform:rotate(0) scale(1)}20%{transform:rotate(-12deg) scale(1.1)}40%{transform:rotate(10deg) scale(1.1)}60%{transform:rotate(-8deg) scale(1.05)}80%{transform:rotate(6deg) scale(1.05)}}
 
-  /* ─── Combat ─── */
-  .combat-log {
-    background: rgba(26,15,0,0.07);
-    border: 1px solid rgba(26,15,0,0.15);
-    border-radius: 3px;
-    padding: 10px;
-    max-height: 220px;
-    overflow-y: auto;
-    margin-bottom: 12px;
-    font-size: 14px;
-    line-height: 1.7;
-  }
-  .log-entry { padding: 2px 0; border-bottom: 1px solid rgba(26,15,0,0.06); }
-  .log-entry:last-child { border-bottom: none; }
-  .log-entry.hit { color: var(--blood-dark); }
-  .log-entry.miss { color: var(--emerald); }
-  .log-entry.info { color: var(--ink-light); font-style: italic; }
-  .log-entry.dmg { color: #4a0000; font-weight: 600; }
-  .log-entry.heal { color: var(--emerald); }
+  /* ── MAIN APP ── */
+  .header{background:linear-gradient(180deg,#1a0a00 0%,#2d1500 60%,#1a0a00 100%);border-bottom:3px solid var(--gold);padding:18px 16px 14px;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'⚔';position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:22px;opacity:.6;color:var(--gold);}
+  .header::after{content:'⚔';position:absolute;right:16px;top:50%;transform:translateY(-50%) scaleX(-1);font-size:22px;opacity:.6;color:var(--gold);}
+  .header-title{font-family:'Cinzel Decorative',cursive;font-size:13px;color:var(--gold-light);letter-spacing:3px;text-transform:uppercase;line-height:1;margin-bottom:4px;}
+  .header-sub{font-family:'Cinzel',serif;font-size:10px;color:var(--parchment-dark);letter-spacing:2px;opacity:.7;}
+  .header-name{font-family:'Cinzel',serif;font-size:13px;color:var(--gold);margin-top:5px;letter-spacing:1px;}
 
-  .enemy-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(139,26,26,0.08);
-    border: 1px solid rgba(139,26,26,0.25);
-    border-radius: 4px;
-    padding: 10px 12px;
-    margin-bottom: 12px;
-  }
-  .enemy-name-area { flex: 1; }
-  .enemy-name {
-    font-family: 'Cinzel', serif;
-    font-size: 13px;
-    color: var(--blood-dark);
-    margin-bottom: 2px;
-  }
-  .enemy-stat-row { display: flex; gap: 14px; font-size: 12px; color: var(--ink-light); }
-  .enemy-stat span { font-family: 'Cinzel', serif; font-size: 11px; }
+  .nav{display:flex;background:#120800;border-bottom:2px solid var(--gold-dark);}
+  .nav-tab{flex:1;padding:10px 4px;text-align:center;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--parchment-dark);text-transform:uppercase;border-right:1px solid rgba(201,168,76,.2);transition:all .2s;-webkit-tap-highlight-color:transparent;}
+  .nav-tab:last-child{border-right:none;}
+  .nav-tab.active{background:linear-gradient(180deg,rgba(201,168,76,.2) 0%,rgba(201,168,76,.05) 100%);color:var(--gold-light);border-bottom:2px solid var(--gold);margin-bottom:-2px;}
+  .nav-tab .tab-icon{font-size:16px;display:block;margin-bottom:2px;}
 
-  .field-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .field-label {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    width: 80px;
-    flex-shrink: 0;
-  }
-  .field-input {
-    flex: 1;
-    padding: 7px 10px;
-    background: rgba(240,228,200,0.8);
-    border: 1px solid var(--gold-dark);
-    border-radius: 3px;
-    font-family: 'EB Garamond', serif;
-    font-size: 15px;
-    color: var(--ink);
-    outline: none;
-  }
-  .field-input:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(201,168,76,0.2); }
+  .content{flex:1;overflow-y:auto;padding:16px;}
+  .panel{display:none;animation:fadeIn .3s ease;}
+  .panel.active{display:block;}
 
-  /* ─── Inventory ─── */
-  .item-list { list-style: none; }
-  .item-entry {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 0;
-    border-bottom: 1px solid rgba(201,168,76,0.2);
-  }
-  .item-entry:last-child { border-bottom: none; }
-  .item-icon { font-size: 18px; flex-shrink: 0; width: 28px; text-align: center; }
-  .item-name { flex: 1; font-size: 15px; color: var(--ink); }
-  .item-qty {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    color: var(--ink-light);
-    background: rgba(26,15,0,0.08);
-    border: 1px solid rgba(26,15,0,0.15);
-    border-radius: 3px;
-    padding: 2px 8px;
-  }
-  .item-del {
-    width: 26px; height: 26px;
-    background: none;
-    border: 1px solid rgba(139,26,26,0.3);
-    border-radius: 3px;
-    color: var(--blood);
-    font-size: 14px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .add-item-row {
-    display: flex; gap: 8px; margin-top: 10px;
-  }
-  .add-item-row input {
-    flex: 1;
-    padding: 8px 10px;
-    background: rgba(240,228,200,0.8);
-    border: 1px solid var(--gold-dark);
-    border-radius: 3px;
-    font-family: 'EB Garamond', serif;
-    font-size: 14px;
-    color: var(--ink);
-    outline: none;
-  }
-  .add-item-row input::placeholder { opacity: 0.5; }
-  .add-btn {
-    padding: 8px 14px;
-    background: linear-gradient(180deg, var(--emerald-light) 0%, var(--emerald) 100%);
-    border: 1px solid rgba(45,138,88,0.6);
-    color: var(--parchment);
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 3px;
-    -webkit-tap-highlight-color: transparent;
-  }
+  .card{background:var(--section-bg);border:1px solid rgba(201,168,76,.4);border-radius:4px;margin-bottom:14px;overflow:hidden;box-shadow:0 2px 8px rgba(26,15,0,.12),inset 0 1px 0 rgba(255,255,255,.3);}
+  .card-header{background:linear-gradient(90deg,rgba(26,15,0,.85) 0%,rgba(61,43,15,.85) 100%);padding:8px 14px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold-light);text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+  .card-header .icon{font-size:14px;}
+  .card-body{padding:14px;}
 
-  /* Gold tracker */
-  .gold-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-  }
-  .gold-amount {
-    font-family: 'Cinzel Decorative', cursive;
-    font-size: 32px;
-    color: var(--gold-dark);
-  }
-  .gold-coin { font-size: 28px; }
+  .stat-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .stat-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);width:90px;flex-shrink:0;}
+  .stat-controls{display:flex;align-items:center;gap:8px;flex:1;}
+  .stat-btn{width:34px;height:34px;border:1.5px solid var(--gold-dark);background:linear-gradient(180deg,#2d1500 0%,#1a0a00 100%);color:var(--gold-light);font-size:18px;cursor:pointer;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;transition:all .15s;-webkit-tap-highlight-color:transparent;flex-shrink:0;}
+  .stat-btn:active{transform:scale(.93);background:linear-gradient(180deg,#4a2200 0%,#2d1500 100%);}
+  .stat-value{font-family:'Cinzel Decorative',cursive;font-size:26px;color:var(--ink);min-width:44px;text-align:center;line-height:1;}
+  .stat-max{font-family:'EB Garamond',serif;font-size:13px;color:var(--ink-light);opacity:.6;}
+  .hp-bar-wrap{flex:1;height:10px;background:rgba(26,15,0,.15);border-radius:5px;overflow:hidden;border:1px solid rgba(26,15,0,.2);}
+  .hp-bar{height:100%;border-radius:5px;transition:width .4s ease,background .4s ease;}
 
-  /* ─── Notes ─── */
-  .notes-textarea {
-    width: 100%;
-    min-height: 160px;
-    padding: 12px;
-    background: rgba(240,228,200,0.7);
-    border: 1px solid var(--gold-dark);
-    border-radius: 3px;
-    font-family: 'EB Garamond', serif;
-    font-size: 15px;
-    color: var(--ink);
-    resize: vertical;
-    outline: none;
-    line-height: 1.7;
-  }
-  .notes-textarea:focus { border-color: var(--gold); }
+  .dice-area{text-align:center;}
+  .dice-results{display:flex;justify-content:center;gap:16px;margin-bottom:16px;flex-wrap:wrap;}
+  .die-face{width:64px;height:64px;background:linear-gradient(135deg,#2d1500 0%,#1a0a00 100%);border:2px solid var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Cinzel Decorative',cursive;font-size:28px;color:var(--gold-light);box-shadow:0 4px 12px rgba(0,0,0,.4),inset 0 1px 0 rgba(201,168,76,.2);}
+  .die-face.rolling{animation:shake .5s ease;}
+  .dice-total{font-family:'Cinzel Decorative',cursive;font-size:36px;color:var(--ink);margin:8px 0 4px;}
+  .dice-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-light);opacity:.7;margin-bottom:16px;}
+  .dice-buttons{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+  .roll-btn{padding:11px 20px;background:linear-gradient(180deg,#8b1a1a 0%,#5c0e0e 100%);border:1.5px solid #c9453a;color:var(--parchment);font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;border-radius:3px;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+  .roll-btn:active{transform:scale(.95);filter:brightness(1.2);}
+  .roll-btn.primary{background:linear-gradient(180deg,#2d5a1a 0%,#1a3a0e 100%);border-color:#5aab3a;}
 
-  /* ─── Toast ─── */
-  .toast {
-    position: fixed;
-    bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-    background: linear-gradient(135deg, #1a0a00 0%, #2d1500 100%);
-    border: 1px solid var(--gold);
-    color: var(--parchment);
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 1px;
-    padding: 10px 24px;
-    border-radius: 4px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    z-index: 100;
-    transition: transform 0.3s ease;
-    text-align: center;
-    max-width: 300px;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
+  .combat-log{background:rgba(26,15,0,.07);border:1px solid rgba(26,15,0,.15);border-radius:3px;padding:10px;max-height:220px;overflow-y:auto;margin-bottom:12px;font-size:14px;line-height:1.7;}
+  .log-entry{padding:2px 0;border-bottom:1px solid rgba(26,15,0,.06);}
+  .log-entry:last-child{border-bottom:none;}
+  .log-entry.hit{color:var(--blood-dark);}
+  .log-entry.miss{color:var(--emerald);}
+  .log-entry.info{color:var(--ink-light);font-style:italic;}
+  .log-entry.dmg{color:#4a0000;font-weight:600;}
+  .log-entry.heal{color:var(--emerald);}
 
-  /* ─── Ornament divider ─── */
-  .ornament {
-    text-align: center;
-    color: var(--gold-dark);
-    font-size: 14px;
-    letter-spacing: 6px;
-    margin: 6px 0 14px;
-    opacity: 0.6;
-  }
+  .field-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .field-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);width:80px;flex-shrink:0;}
+  .field-input{flex:1;padding:7px 10px;background:rgba(240,228,200,.8);border:1px solid var(--gold-dark);border-radius:3px;font-family:'EB Garamond',serif;font-size:15px;color:var(--ink);outline:none;}
+  .field-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.2);}
 
-  /* ─── Scrollbar ─── */
-  .content::-webkit-scrollbar { width: 4px; }
-  .content::-webkit-scrollbar-track { background: transparent; }
-  .content::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 2px; }
+  .item-list{list-style:none;}
+  .item-entry{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(201,168,76,.2);}
+  .item-entry:last-child{border-bottom:none;}
+  .item-icon{font-size:18px;flex-shrink:0;width:28px;text-align:center;}
+  .item-name{flex:1;font-size:15px;color:var(--ink);}
+  .item-qty{font-family:'Cinzel',serif;font-size:12px;color:var(--ink-light);background:rgba(26,15,0,.08);border:1px solid rgba(26,15,0,.15);border-radius:3px;padding:2px 8px;}
+  .item-del{width:26px;height:26px;background:none;border:1px solid rgba(139,26,26,.3);border-radius:3px;color:var(--blood);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+  .add-item-row{display:flex;gap:8px;margin-top:10px;}
+  .add-item-row input{flex:1;padding:8px 10px;background:rgba(240,228,200,.8);border:1px solid var(--gold-dark);border-radius:3px;font-family:'EB Garamond',serif;font-size:14px;color:var(--ink);outline:none;}
+  .add-item-row input::placeholder{opacity:.5;}
+  .add-btn{padding:8px 14px;background:linear-gradient(180deg,var(--emerald-light) 0%,var(--emerald) 100%);border:1px solid rgba(45,138,88,.6);color:var(--parchment);font-family:'Cinzel',serif;font-size:12px;cursor:pointer;border-radius:3px;-webkit-tap-highlight-color:transparent;}
 
-  .section-title {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--gold-dark);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .section-title::before, .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dark), transparent);
-  }
+  .gold-display{display:flex;align-items:center;justify-content:center;gap:14px;}
+  .gold-amount{font-family:'Cinzel Decorative',cursive;font-size:32px;color:var(--gold-dark);}
+  .gold-coin{font-size:28px;}
 
-  .potion-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-  .potion-count {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .potion-pip {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    border: 2px solid var(--emerald-light);
-    background: rgba(26,92,58,0.2);
-    cursor: pointer;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .potion-pip.used {
-    background: rgba(26,92,58,0.05);
-    border-color: rgba(26,92,58,0.2);
-  }
-  .potion-pip.full {
-    background: linear-gradient(135deg, #2d8a58 0%, #1a5c3a 100%);
-    box-shadow: 0 0 6px rgba(45,138,88,0.4);
-  }
+  .notes-textarea{width:100%;min-height:160px;padding:12px;background:rgba(240,228,200,.7);border:1px solid var(--gold-dark);border-radius:3px;font-family:'EB Garamond',serif;font-size:15px;color:var(--ink);resize:vertical;outline:none;line-height:1.7;}
+  .notes-textarea:focus{border-color:var(--gold);}
+
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,#1a0a00,#2d1500);border:1px solid var(--gold);color:var(--parchment);font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;padding:10px 24px;border-radius:4px;box-shadow:0 4px 20px rgba(0,0,0,.5);z-index:300;transition:transform .3s ease;text-align:center;max-width:300px;}
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  .ornament{text-align:center;color:var(--gold-dark);font-size:14px;letter-spacing:6px;margin:6px 0 14px;opacity:.6;}
+  .section-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+  .section-title::before,.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dark),transparent);}
+
+  .potion-count{display:flex;gap:6px;flex-wrap:wrap;}
+  .potion-pip{width:22px;height:22px;border-radius:50%;border:2px solid var(--emerald-light);background:rgba(26,92,58,.2);cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+  .potion-pip.used{background:rgba(26,92,58,.05);border-color:rgba(26,92,58,.2);}
+  .potion-pip.full{background:linear-gradient(135deg,#2d8a58,#1a5c3a);box-shadow:0 0 6px rgba(45,138,88,.4);}
+
+  .content::-webkit-scrollbar{width:4px;}
+  .content::-webkit-scrollbar-track{background:transparent;}
+  .content::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:2px;}
+
+  .wiz-reopen-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);color:var(--gold);font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;padding:5px 9px;border-radius:3px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+
+  /* ── COMBAT MODIFIERS ── */
+  .mod-section{background:rgba(26,15,0,.05);border:1px solid rgba(201,168,76,.25);border-radius:4px;padding:12px 14px;margin-bottom:12px;}
+  .mod-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .mod-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gold-dark),transparent);}
+  .mod-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .mod-row:last-child{margin-bottom:0;}
+  .mod-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);flex:1;}
+  .mod-controls{display:flex;align-items:center;gap:6px;}
+  .mod-btn{width:28px;height:28px;border:1.5px solid var(--gold-dark);background:linear-gradient(180deg,#2d1500,#1a0a00);color:var(--gold-light);font-size:16px;cursor:pointer;border-radius:3px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+  .mod-btn:active{transform:scale(.9);}
+  .mod-val{font-family:'Cinzel Decorative',cursive;font-size:20px;min-width:36px;text-align:center;line-height:1;}
+  .mod-val.positive{color:var(--emerald);}
+  .mod-val.negative{color:var(--blood-dark);}
+  .mod-val.zero{color:var(--ink-light);}
+  .mod-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;}
+  .mod-badge.pos{background:rgba(26,92,58,.12);border:1px solid rgba(26,92,58,.3);color:var(--emerald);}
+  .mod-badge.neg{background:rgba(139,26,26,.1);border:1px solid rgba(139,26,26,.25);color:var(--blood-dark);}
+  .mod-badge.neu{background:rgba(26,15,0,.06);border:1px solid rgba(26,15,0,.15);color:var(--ink-light);}
+  .mod-preset-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .mod-preset{padding:5px 10px;border-radius:3px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:1px solid;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+  .mod-preset:active{transform:scale(.95);}
+  .mod-preset.neg-preset{background:rgba(139,26,26,.08);border-color:rgba(139,26,26,.3);color:var(--blood-dark);}
+  .mod-preset.pos-preset{background:rgba(26,92,58,.08);border-color:rgba(26,92,58,.3);color:var(--emerald);}
+  .fa-summary{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+  .fa-chip{flex:1;min-width:120px;background:rgba(26,15,0,.06);border:1px solid rgba(201,168,76,.2);border-radius:4px;padding:8px 10px;text-align:center;}
+  .fa-chip-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);margin-bottom:3px;}
+  .fa-chip-val{font-family:'Cinzel Decorative',cursive;font-size:18px;color:var(--ink);}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- Header -->
+  <!-- ══════════════ WIZARD OVERLAY ══════════════ -->
+  <div id="wizard">
+    <div class="wiz-box">
+      <div class="wiz-header">
+        <div class="wiz-title">Création de Héros</div>
+        <div class="wiz-sub">Défi Fantastique</div>
+      </div>
+
+      <!-- Progress dots -->
+      <div class="wiz-progress" id="wiz-progress">
+        <div class="wiz-step-dot active" id="dot-0"><span class="dot"></span>Début</div>
+        <div class="wiz-step-dot" id="dot-1"><span class="dot"></span>Nom</div>
+        <div class="wiz-step-dot" id="dot-2"><span class="dot"></span>Hab.</div>
+        <div class="wiz-step-dot" id="dot-3"><span class="dot"></span>End.</div>
+        <div class="wiz-step-dot" id="dot-4"><span class="dot"></span>Chance</div>
+        <div class="wiz-step-dot" id="dot-5"><span class="dot"></span>Équip.</div>
+        <div class="wiz-step-dot" id="dot-6"><span class="dot"></span>Résumé</div>
+      </div>
+
+      <div class="wiz-content">
+
+        <!-- ── Étape 0 : Intro ── -->
+        <div class="wiz-screen active" id="wiz-0">
+          <div class="wiz-intro">
+            <div class="wiz-intro-icon">⚔️</div>
+            <h2>Votre Aventure Commence</h2>
+            <p>Avant de vous lancer dans les pages du livre, vous devez créer votre personnage en suivant les règles officielles de la série <em>Défi Fantastique</em>.</p>
+          </div>
+          <div class="rule-box">
+            <strong>Les trois caractéristiques</strong><br>
+            Votre héros est défini par trois scores : <strong>Habileté</strong>, <strong>Endurance</strong> et <strong>Chance</strong>, déterminés par des jets de dés.<br><br>
+            <strong>Équipement de départ</strong><br>
+            Vous débutez avec une épée, un bouclier en cuir, une lanterne, des provisions de voyage et une somme en pièces d'or.
+          </div>
+          <div class="rule-box">
+            <strong>🎲 Règle des dés</strong><br>
+            Lancez les dés en suivant les instructions de chaque étape. Vous pouvez relancer une fois si le résultat vous semble trop défavorable.
+          </div>
+        </div>
+
+        <!-- ── Étape 1 : Nom & Livre ── -->
+        <div class="wiz-screen" id="wiz-1">
+          <div class="wiz-intro">
+            <div class="wiz-intro-icon">📖</div>
+            <h2>Votre Identité</h2>
+            <p>Comment s'appelle votre héros ? Quel livre allez-vous affronter ?</p>
+          </div>
+          <input class="name-input" id="wiz-name" type="text" placeholder="Nom du personnage…" maxlength="30">
+          <input class="name-input book-input" id="wiz-book" type="text" placeholder="Titre ou numéro du livre…" maxlength="60">
+          <div class="rule-box" style="margin-top:8px;">
+            Votre nom n'affecte pas vos statistiques, mais chaque héros mérite une identité digne de la légende qu'il va forger.
+          </div>
+        </div>
+
+        <!-- ── Étape 2 : Habileté ── -->
+        <div class="wiz-screen" id="wiz-2">
+          <div class="wiz-intro" style="padding-bottom:8px;">
+            <div class="wiz-intro-icon">⚔️</div>
+            <h2>Habileté</h2>
+          </div>
+          <div class="rule-box">
+            <strong>Formule : 1d6 + 6</strong><br>
+            L'Habileté représente votre adresse au combat, votre dextérité et votre vivacité d'esprit. Elle entre dans le calcul de votre <em>Force d'Attaque</em> à chaque round de combat.<br><br>
+            Elle ne peut jamais dépasser cette valeur initiale (sauf exception rare précisée dans le livre).
+          </div>
+          <div class="roll-result-big">
+            <div class="formula">1d6 + 6</div>
+            <div class="dice-row">
+              <div class="d" id="wiz-d-skill">?</div>
+              <div class="d" style="background:rgba(26,15,0,.2);border-color:rgba(201,168,76,.2);color:rgba(201,168,76,.35);">+6</div>
+            </div>
+            <div class="total" id="wiz-skill-roll">–</div>
+            <div class="bonus">Habileté initiale</div>
+          </div>
+          <div id="wiz-skill-reroll-hint" style="text-align:center;font-size:13px;color:var(--ink-light);display:none;margin-top:-8px;margin-bottom:8px;">Vous pouvez relancer une fois.</div>
+        </div>
+
+        <!-- ── Étape 3 : Endurance ── -->
+        <div class="wiz-screen" id="wiz-3">
+          <div class="wiz-intro" style="padding-bottom:8px;">
+            <div class="wiz-intro-icon">❤️</div>
+            <h2>Endurance</h2>
+          </div>
+          <div class="rule-box">
+            <strong>Formule : 2d6 + 12</strong><br>
+            L'Endurance mesure votre résistance physique et votre volonté de survivre. Elle diminue lorsque vous êtes blessé et peut être restaurée par des provisions ou des potions.<br><br>
+            Si l'Endurance tombe à <strong>0 ou moins</strong>, votre personnage est mort — l'aventure est terminée.
+          </div>
+          <div class="roll-result-big">
+            <div class="formula">2d6 + 12</div>
+            <div class="dice-row">
+              <div class="d" id="wiz-d-stamina1">?</div>
+              <div class="d" id="wiz-d-stamina2">?</div>
+              <div class="d" style="background:rgba(26,15,0,.2);border-color:rgba(201,168,76,.2);color:rgba(201,168,76,.35);">+12</div>
+            </div>
+            <div class="total" id="wiz-stamina-roll">–</div>
+            <div class="bonus">Endurance initiale</div>
+          </div>
+          <div id="wiz-stamina-reroll-hint" style="text-align:center;font-size:13px;color:var(--ink-light);display:none;margin-top:-8px;margin-bottom:8px;">Vous pouvez relancer une fois.</div>
+        </div>
+
+        <!-- ── Étape 4 : Chance ── -->
+        <div class="wiz-screen" id="wiz-4">
+          <div class="wiz-intro" style="padding-bottom:8px;">
+            <div class="wiz-intro-icon">🍀</div>
+            <h2>Chance</h2>
+          </div>
+          <div class="rule-box">
+            <strong>Formule : 1d6 + 6</strong><br>
+            La Chance vous permet de « Tenter la Chance » dans des situations périlleuses. Si votre jet (2d6) est inférieur ou égal à votre score de Chance, vous êtes <em>Chanceux</em> — sinon <em>Malchanceux</em>.<br><br>
+            À chaque tentative, la Chance diminue de 1 point, qu'elle soit heureuse ou non.
+          </div>
+          <div class="roll-result-big">
+            <div class="formula">1d6 + 6</div>
+            <div class="dice-row">
+              <div class="d" id="wiz-d-luck">?</div>
+              <div class="d" style="background:rgba(26,15,0,.2);border-color:rgba(201,168,76,.2);color:rgba(201,168,76,.35);">+6</div>
+            </div>
+            <div class="total" id="wiz-luck-roll">–</div>
+            <div class="bonus">Chance initiale</div>
+          </div>
+          <div id="wiz-luck-reroll-hint" style="text-align:center;font-size:13px;color:var(--ink-light);display:none;margin-top:-8px;margin-bottom:8px;">Vous pouvez relancer une fois.</div>
+        </div>
+
+        <!-- ── Étape 5 : Équipement ── -->
+        <div class="wiz-screen" id="wiz-5">
+          <div class="wiz-intro" style="padding-bottom:8px;">
+            <div class="wiz-intro-icon">🎒</div>
+            <h2>Équipement de Départ</h2>
+          </div>
+          <div class="rule-box">
+            Tout aventurier commence avec un équipement standard. Choisissez votre type de départ, puis votre or de départ est déterminé par un jet de dé.
+          </div>
+
+          <div class="equip-choice" id="equip-choices">
+            <div class="equip-opt selected" data-equip="guerrier" onclick="selectEquip(this)">
+              <div class="opt-title">⚔️ Guerrier</div>
+              <div class="opt-items">Épée, bouclier en cuir, lanterne + huile, sac à dos, 10 provisions, corde (5m)</div>
+            </div>
+            <div class="equip-opt" data-equip="archer" onclick="selectEquip(this)">
+              <div class="opt-title">🏹 Rôdeur</div>
+              <div class="opt-items">Épée courte, arc + 8 flèches, carquois, lanterne, sac à dos, 8 provisions</div>
+            </div>
+            <div class="equip-opt" data-equip="mage" onclick="selectEquip(this)">
+              <div class="opt-title">✨ Aventurier Érudit</div>
+              <div class="opt-items">Dague, bâton, livre de sorts vierge, lanterne, sac à dos, 8 provisions, parchemin vierge</div>
+            </div>
+          </div>
+
+          <div class="roll-result-big" style="margin-top:14px;">
+            <div class="formula">Or de départ : 1d6 × 10 PO</div>
+            <div class="dice-row">
+              <div class="d" id="wiz-d-gold">?</div>
+              <div class="d" style="background:rgba(26,15,0,.2);border-color:rgba(201,168,76,.2);color:rgba(201,168,76,.35);">×10</div>
+            </div>
+            <div class="total" id="wiz-gold-roll" style="color:var(--gold-dark);">–</div>
+            <div class="bonus" id="wiz-gold-label">Pièces d'or</div>
+          </div>
+        </div>
+
+        <!-- ── Étape 6 : Résumé ── -->
+        <div class="wiz-screen" id="wiz-6">
+          <div class="wiz-intro" style="padding-bottom:8px;">
+            <div class="wiz-intro-icon">📜</div>
+            <h2>Votre Héros est Prêt</h2>
+          </div>
+          <div class="stat-preview" id="wiz-stat-preview">
+            <div class="stat-chip rolled"><div class="sc-label">Habileté</div><div class="sc-val" id="sum-skill">–</div></div>
+            <div class="stat-chip rolled"><div class="sc-label">Endurance</div><div class="sc-val" id="sum-stamina">–</div></div>
+            <div class="stat-chip rolled"><div class="sc-label">Chance</div><div class="sc-val" id="sum-luck">–</div></div>
+          </div>
+          <table class="summary-table" id="summary-table">
+            <tr><td>Nom</td><td id="sum-name">–</td></tr>
+            <tr><td>Livre</td><td id="sum-book">–</td></tr>
+            <tr><td>Équipement</td><td id="sum-equip">–</td></tr>
+            <tr><td>Or</td><td id="sum-gold">–</td></tr>
+            <tr><td>Provisions</td><td id="sum-meals">–</td></tr>
+            <tr><td>Potion</td><td id="sum-potion">1 Potion de Vigueur</td></tr>
+          </table>
+          <div class="rule-box" style="margin-top:8px;font-size:13px;">
+            ✨ Cliquez sur <strong>Commencer l'Aventure</strong> pour charger votre fiche. Bonne chance, aventurier !
+          </div>
+        </div>
+
+      </div><!-- /wiz-content -->
+
+      <div class="wiz-footer" id="wiz-footer">
+        <button class="btn-wiz btn-wiz-back" id="btn-back" onclick="wizBack()" style="display:none;">← Retour</button>
+        <button class="btn-wiz btn-wiz-roll" id="btn-roll" onclick="wizRoll()" style="display:none;">🎲 Lancer les dés</button>
+        <button class="btn-wiz btn-wiz-next" id="btn-next" onclick="wizNext()">Commencer →</button>
+        <button class="btn-wiz btn-wiz-finish" id="btn-finish" onclick="wizFinish()" style="display:none;">⚔️ Commencer l'Aventure !</button>
+      </div>
+    </div>
+  </div><!-- /wizard -->
+
+  <!-- ══════════════ MAIN APP ══════════════ -->
   <div class="header">
     <div class="header-title">Défi Fantastique</div>
-    <div class="header-sub">Fiche de Personnage</div>
+    <div class="header-sub" id="header-book-sub">Fiche de Personnage</div>
+    <div class="header-name" id="header-hero-name"></div>
+    <button class="wiz-reopen-btn" onclick="reopenWizard()" title="Recréer un personnage">✦ Nouveau</button>
   </div>
 
-  <!-- Nav -->
   <div class="nav">
-    <div class="nav-tab active" onclick="showPanel('stats')">
-      <span class="tab-icon">🛡</span>Stats
-    </div>
-    <div class="nav-tab" onclick="showPanel('dice')">
-      <span class="tab-icon">🎲</span>Dés
-    </div>
-    <div class="nav-tab" onclick="showPanel('combat')">
-      <span class="tab-icon">⚔️</span>Combat
-    </div>
-    <div class="nav-tab" onclick="showPanel('inventory')">
-      <span class="tab-icon">🎒</span>Sac
-    </div>
-    <div class="nav-tab" onclick="showPanel('notes')">
-      <span class="tab-icon">📜</span>Notes
-    </div>
+    <div class="nav-tab active" onclick="showPanel('stats')"><span class="tab-icon">🛡</span>Stats</div>
+    <div class="nav-tab" onclick="showPanel('dice')"><span class="tab-icon">🎲</span>Dés</div>
+    <div class="nav-tab" onclick="showPanel('combat')"><span class="tab-icon">⚔️</span>Combat</div>
+    <div class="nav-tab" onclick="showPanel('inventory')"><span class="tab-icon">🎒</span>Sac</div>
+    <div class="nav-tab" onclick="showPanel('notes')"><span class="tab-icon">📜</span>Notes</div>
   </div>
 
-  <!-- Content -->
   <div class="content">
 
-    <!-- ═══ STATS PANEL ═══ -->
+    <!-- STATS -->
     <div class="panel active" id="panel-stats">
-
-      <!-- Identité -->
       <div class="card">
         <div class="card-header"><span class="icon">📖</span> Identité</div>
         <div class="card-body">
-          <div class="field-row">
-            <span class="field-label">Nom</span>
-            <input class="field-input" id="char-name" type="text" placeholder="Votre héros…" oninput="save()">
-          </div>
-          <div class="field-row">
-            <span class="field-label">Titre</span>
-            <input class="field-input" id="char-title" type="text" placeholder="Aventurier, Mage…" oninput="save()">
-          </div>
-          <div class="field-row">
-            <span class="field-label">Livre</span>
-            <input class="field-input" id="char-book" type="text" placeholder="N° et titre du livre" oninput="save()">
-          </div>
+          <div class="field-row"><span class="field-label">Nom</span><input class="field-input" id="char-name" type="text" oninput="save()"></div>
+          <div class="field-row"><span class="field-label">Livre</span><input class="field-input" id="char-book" type="text" oninput="save()"></div>
         </div>
       </div>
-
-      <!-- Caractéristiques -->
       <div class="card">
         <div class="card-header"><span class="icon">⚔️</span> Caractéristiques</div>
         <div class="card-body">
@@ -607,11 +463,8 @@
               <button class="stat-btn" onclick="changeStat('stamina',+1)">+</button>
             </div>
           </div>
-          <!-- HP bar -->
-          <div style="margin-top:-4px; margin-bottom:12px; padding: 0 2px;">
-            <div class="hp-bar-wrap">
-              <div class="hp-bar" id="hp-bar" style="width:83%"></div>
-            </div>
+          <div style="margin-top:-4px;margin-bottom:12px;padding:0 2px;">
+            <div class="hp-bar-wrap"><div class="hp-bar" id="hp-bar" style="width:83%"></div></div>
           </div>
           <div class="stat-row">
             <span class="stat-label">Chance</span>
@@ -622,52 +475,26 @@
               <button class="stat-btn" onclick="changeStat('luck',+1)">+</button>
             </div>
           </div>
-
-          <!-- Ajuster max -->
-          <div class="ornament">· · ·</div>
-          <div class="section-title">Valeurs initiales</div>
-          <div class="field-row">
-            <span class="field-label">Hab. max</span>
-            <input class="field-input" id="skill-max-in" type="number" min="1" max="20" value="12" oninput="setMax('skill')">
-          </div>
-          <div class="field-row">
-            <span class="field-label">End. max</span>
-            <input class="field-input" id="stamina-max-in" type="number" min="1" max="40" value="24" oninput="setMax('stamina')">
-          </div>
-          <div class="field-row">
-            <span class="field-label">Cha. max</span>
-            <input class="field-input" id="luck-max-in" type="number" min="1" max="20" value="10" oninput="setMax('luck')">
-          </div>
         </div>
       </div>
-
-      <!-- Potions -->
       <div class="card">
         <div class="card-header"><span class="icon">🧪</span> Potion de Vigueur</div>
         <div class="card-body">
-          <div style="margin-bottom:10px; font-size:13px; color:var(--ink-light);">
-            Chaque potion restaure l'Endurance à son maximum initial.
-          </div>
-          <div class="potion-row">
-            <div class="potion-count" id="potion-pips"></div>
-          </div>
-          <div style="display:flex; gap:10px; margin-top:8px;">
+          <div style="margin-bottom:10px;font-size:13px;color:var(--ink-light);">Restaure l'Endurance à son maximum.</div>
+          <div class="potion-count" id="potion-pips"></div>
+          <div style="display:flex;gap:10px;margin-top:12px;">
             <button class="roll-btn primary" onclick="addPotion()" style="font-size:11px;padding:8px 14px;">+ Potion</button>
             <button class="roll-btn" onclick="removePotion()" style="font-size:11px;padding:8px 14px;">– Potion</button>
             <button class="roll-btn" onclick="drinkPotion()" style="font-size:11px;padding:8px 14px;background:linear-gradient(180deg,#2d5a1a,#1a3a0e);border-color:#5aab3a;">🧪 Boire</button>
           </div>
         </div>
       </div>
-
-      <!-- Réinitialiser -->
-      <div style="text-align:center; padding: 4px 0 10px;">
-        <button class="roll-btn" onclick="resetConfirm()" style="font-size:10px; padding:8px 18px; opacity:0.6;">
-          Nouvelle partie
-        </button>
+      <div style="text-align:center;padding:4px 0 10px;">
+        <button class="roll-btn" onclick="reopenWizard()" style="font-size:10px;padding:8px 18px;opacity:.6;">✦ Nouveau personnage</button>
       </div>
     </div>
 
-    <!-- ═══ DICE PANEL ═══ -->
+    <!-- DICE -->
     <div class="panel" id="panel-dice">
       <div class="card">
         <div class="card-header"><span class="icon">🎲</span> Lancer de Dés</div>
@@ -684,45 +511,96 @@
           </div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><span class="icon">🍀</span> Tenter la Chance</div>
         <div class="card-body">
-          <div style="font-size:14px; color:var(--ink-light); margin-bottom:12px; line-height:1.7;">
-            Lancez 2d6. Si le résultat est ≤ à votre score de Chance actuel, vous <strong>Chanceux</strong>. Sinon, vous êtes <strong>Malchanceux</strong>. Dans les deux cas, votre Chance diminue de 1.
+          <div style="font-size:14px;color:var(--ink-light);margin-bottom:12px;line-height:1.7;">
+            Lancez 2d6. Si le résultat est ≤ à votre Chance actuelle → <strong>Chanceux</strong>. Sinon → <strong>Malchanceux</strong>. La Chance diminue de 1 dans tous les cas.
           </div>
-          <div id="luck-result" style="text-align:center; font-family:'Cinzel Decorative',cursive; font-size:22px; min-height:34px; margin-bottom:12px; color:var(--ink);"></div>
-          <div style="text-align:center;">
-            <button class="roll-btn primary" onclick="testLuck()">🍀 Tenter la Chance</button>
-          </div>
+          <div id="luck-result" style="text-align:center;font-family:'Cinzel Decorative',cursive;font-size:22px;min-height:34px;margin-bottom:12px;color:var(--ink);"></div>
+          <div style="text-align:center;"><button class="roll-btn primary" onclick="testLuck()">🍀 Tenter la Chance</button></div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><span class="icon">📊</span> Historique</div>
         <div class="card-body">
-          <div id="dice-history" style="font-size:13px; color:var(--ink-light); line-height:1.8; min-height:40px;"></div>
-          <button class="roll-btn" onclick="clearHistory()" style="font-size:10px; padding:6px 14px; margin-top:8px; opacity:0.6;">Effacer</button>
+          <div id="dice-history" style="font-size:13px;color:var(--ink-light);line-height:1.8;min-height:40px;"></div>
+          <button class="roll-btn" onclick="clearHistory()" style="font-size:10px;padding:6px 14px;margin-top:8px;opacity:.6;">Effacer</button>
         </div>
       </div>
     </div>
 
-    <!-- ═══ COMBAT PANEL ═══ -->
+    <!-- COMBAT -->
     <div class="panel" id="panel-combat">
       <div class="card">
         <div class="card-header"><span class="icon">👹</span> Adversaire</div>
         <div class="card-body">
-          <div class="field-row">
-            <span class="field-label">Nom</span>
-            <input class="field-input" id="enemy-name" type="text" placeholder="Gobelin, Dragon…">
+          <div class="field-row"><span class="field-label">Nom</span><input class="field-input" id="enemy-name" type="text" placeholder="Gobelin, Dragon…"></div>
+          <div class="field-row"><span class="field-label">Habileté</span><input class="field-input" id="enemy-skill" type="number" min="1" max="30" value="7"></div>
+          <div class="field-row"><span class="field-label">Endurance</span><input class="field-input" id="enemy-stamina" type="number" min="1" max="50" value="10"></div>
+        </div>
+      </div>
+
+      <!-- MODIFICATEURS -->
+      <div class="card">
+        <div class="card-header"><span class="icon">⚗️</span> Modificateurs de Combat</div>
+        <div class="card-body">
+          <div style="font-size:13px;color:var(--ink-light);margin-bottom:12px;line-height:1.6;">
+            Ajustements globaux appliqués à chaque jet pendant tout ce combat (poison, ivresse, magie, blessure…).
           </div>
-          <div class="field-row">
-            <span class="field-label">Habileté</span>
-            <input class="field-input" id="enemy-skill" type="number" min="1" max="30" value="7">
+
+          <div class="mod-section">
+            <div class="mod-title">Votre jet de dés</div>
+            <div class="mod-row">
+              <span class="mod-label">Modificateur héros</span>
+              <div class="mod-controls">
+                <button class="mod-btn" onclick="changeMod('hero',-1)">−</button>
+                <span class="mod-val" id="mod-hero-val">0</span>
+                <button class="mod-btn" onclick="changeMod('hero',+1)">+</button>
+              </div>
+            </div>
+            <div class="mod-preset-row">
+              <button class="mod-preset neg-preset" onclick="setMod('hero',-2)" title="Blessure légère">🩸 Blessé (−2)</button>
+              <button class="mod-preset neg-preset" onclick="setMod('hero',-4)" title="Empoisonné">☠ Empoisonné (−4)</button>
+              <button class="mod-preset pos-preset" onclick="setMod('hero',+2)" title="Bénédiction">✨ Béni (+2)</button>
+              <button class="mod-preset pos-preset" onclick="setMod('hero',+1)" title="Arme enchantée">⚔ Arme mag. (+1)</button>
+              <button class="mod-preset neu-preset" onclick="setMod('hero',0)" style="background:rgba(26,15,0,.06);border-color:rgba(26,15,0,.2);color:var(--ink-light);">↺ Reset</button>
+            </div>
           </div>
-          <div class="field-row">
-            <span class="field-label">Endurance</span>
-            <input class="field-input" id="enemy-stamina" type="number" min="1" max="50" value="10">
+
+          <div class="mod-section">
+            <div class="mod-title">Jet de l'adversaire</div>
+            <div class="mod-row">
+              <span class="mod-label">Modificateur ennemi</span>
+              <div class="mod-controls">
+                <button class="mod-btn" onclick="changeMod('enemy',-1)">−</button>
+                <span class="mod-val" id="mod-enemy-val">0</span>
+                <button class="mod-btn" onclick="changeMod('enemy',+1)">+</button>
+              </div>
+            </div>
+            <div class="mod-preset-row">
+              <button class="mod-preset neg-preset" onclick="setMod('enemy',-2)" title="Adversaire ivre">🍺 Ivre (−2)</button>
+              <button class="mod-preset neg-preset" onclick="setMod('enemy',-3)" title="Adversaire empoisonné">☠ Empoisonné (−3)</button>
+              <button class="mod-preset neg-preset" onclick="setMod('enemy',-1)" title="Adversaire aveuglé">👁 Aveuglé (−1)</button>
+              <button class="mod-preset pos-preset" onclick="setMod('enemy',+2)" title="Adversaire enragé">😡 Enragé (+2)</button>
+              <button class="mod-preset neu-preset" onclick="setMod('enemy',0)" style="background:rgba(26,15,0,.06);border-color:rgba(26,15,0,.2);color:var(--ink-light);">↺ Reset</button>
+            </div>
+          </div>
+
+          <!-- Résumé FA actif -->
+          <div class="fa-summary" id="fa-summary" style="display:none;">
+            <div class="fa-chip">
+              <div class="fa-chip-label">Votre FA base</div>
+              <div class="fa-chip-val" id="fa-hero-base">–</div>
+            </div>
+            <div class="fa-chip">
+              <div class="fa-chip-label">FA ennemi base</div>
+              <div class="fa-chip-val" id="fa-enemy-base">–</div>
+            </div>
+          </div>
+
+          <div id="mod-active-badge" style="text-align:center;margin-top:4px;font-size:13px;color:var(--ink-light);font-style:italic;">
+            Aucun modificateur actif
           </div>
         </div>
       </div>
@@ -730,27 +608,23 @@
       <div class="card">
         <div class="card-header"><span class="icon">⚔️</span> Round de Combat</div>
         <div class="card-body">
-          <div style="background:rgba(139,26,26,0.06); border:1px solid rgba(139,26,26,0.15); border-radius:3px; padding:10px 12px; margin-bottom:12px; font-size:13px; color:var(--ink-light); line-height:1.7;">
-            Votre <strong>Force d'Attaque</strong> = 2d6 + Habileté<br>
-            Celle de l'adversaire = 2d6 + son Habileté<br>
-            Différence → dégâts de 2 pts d'Endurance à l'adversaire.<br>
-            Si c'est l'adversaire qui gagne → vous perdez 2 pts.
+          <div style="background:rgba(139,26,26,.06);border:1px solid rgba(139,26,26,.15);border-radius:3px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:var(--ink-light);line-height:1.7;">
+            <strong>Force d'Attaque</strong> = 2d6 + Habileté + Modificateur<br>
+            Le plus haut FA inflige 2 pts de dégâts. Égalité → personne n'est touché.
           </div>
-          <div class="combat-log" id="combat-log">
-            <div class="log-entry info">⚔ Prêt à combattre…</div>
-          </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+          <div class="combat-log" id="combat-log"><div class="log-entry info">⚔ Prêt à combattre…</div></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
             <button class="roll-btn primary" onclick="combatRound()" style="min-width:140px;">⚔️ Combattre !</button>
             <button class="roll-btn" onclick="fightLuck()" style="min-width:140px;">🍀 Chance en combat</button>
           </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
-            <button class="roll-btn" onclick="resetCombat()" style="font-size:10px; padding:7px 14px; opacity:0.6;">Nouveau combat</button>
+          <div style="display:flex;gap:10px;justify-content:center;margin-top:10px;">
+            <button class="roll-btn" onclick="resetCombat()" style="font-size:10px;padding:7px 14px;opacity:.6;">Nouveau combat</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ INVENTORY PANEL ═══ -->
+    <!-- INVENTORY -->
     <div class="panel" id="panel-inventory">
       <div class="card">
         <div class="card-header"><span class="icon">🪙</span> Or</div>
@@ -762,7 +636,7 @@
             <span style="font-family:'Cinzel',serif;font-size:11px;color:var(--ink-light)">PO</span>
             <button class="stat-btn" onclick="changeGold(+1)">+</button>
           </div>
-          <div style="display:flex; gap:8px; justify-content:center; margin-top:12px;">
+          <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">
             <button class="roll-btn" onclick="changeGold(-5)" style="font-size:10px;padding:6px 12px;">−5</button>
             <button class="roll-btn" onclick="changeGold(-10)" style="font-size:10px;padding:6px 12px;">−10</button>
             <button class="roll-btn primary" onclick="changeGold(+5)" style="font-size:10px;padding:6px 12px;">+5</button>
@@ -770,378 +644,551 @@
           </div>
         </div>
       </div>
-
       <div class="card">
         <div class="card-header"><span class="icon">🎒</span> Équipement & Objets</div>
         <div class="card-body">
           <ul class="item-list" id="item-list"></ul>
           <div class="add-item-row">
             <input id="item-input" type="text" placeholder="Nom de l'objet…" onkeydown="if(event.key==='Enter')addItem()">
-            <input id="qty-input" type="number" min="1" max="99" value="1" style="width:52px; padding:8px 6px; background:rgba(240,228,200,0.8); border:1px solid var(--gold-dark); border-radius:3px; font-family:'EB Garamond',serif; font-size:14px; color:var(--ink); outline:none; text-align:center;">
+            <input id="qty-input" type="number" min="1" max="99" value="1" style="width:52px;padding:8px 6px;background:rgba(240,228,200,.8);border:1px solid var(--gold-dark);border-radius:3px;font-family:'EB Garamond',serif;font-size:14px;color:var(--ink);outline:none;text-align:center;">
             <button class="add-btn" onclick="addItem()">Ajouter</button>
           </div>
         </div>
       </div>
-
       <div class="card">
-        <div class="card-header"><span class="icon">✨</span> Provisions</div>
+        <div class="card-header"><span class="icon">🍖</span> Provisions</div>
         <div class="card-body">
-          <div style="font-size:13px; color:var(--ink-light); margin-bottom:10px;">
-            Chaque repas restaure 4 points d'Endurance (hors combat).
-          </div>
+          <div style="font-size:13px;color:var(--ink-light);margin-bottom:10px;">Chaque repas restaure 4 pts d'Endurance (hors combat).</div>
           <div class="stat-row">
             <span class="stat-label">Repas</span>
             <div class="stat-controls">
               <button class="stat-btn" onclick="changeMeals(-1)">−</button>
               <span class="stat-value" id="meals-val">10</span>
               <button class="stat-btn" onclick="changeMeals(+1)">+</button>
-              <button class="roll-btn primary" onclick="eatMeal()" style="font-size:11px; padding:8px 14px; margin-left:4px;">🍖 Manger</button>
+              <button class="roll-btn primary" onclick="eatMeal()" style="font-size:11px;padding:8px 14px;margin-left:4px;">🍖 Manger</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ NOTES PANEL ═══ -->
+    <!-- NOTES -->
     <div class="panel" id="panel-notes">
       <div class="card">
         <div class="card-header"><span class="icon">📜</span> Journal d'Aventure</div>
-        <div class="card-body">
-          <textarea class="notes-textarea" id="notes-area" placeholder="Notez vos aventures, passages importants, indices, personnages rencontrés…" oninput="save()"></textarea>
-        </div>
+        <div class="card-body"><textarea class="notes-textarea" id="notes-area" placeholder="Notez vos aventures, indices, personnages rencontrés…" oninput="save()"></textarea></div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="icon">🗺</span> Numéros de Paragraphes</div>
-        <div class="card-body">
-          <textarea class="notes-textarea" id="para-area" placeholder="Paragraphes visités, chemins explorés…" style="min-height:100px;" oninput="save()"></textarea>
-        </div>
+        <div class="card-header"><span class="icon">🗺</span> Paragraphes</div>
+        <div class="card-body"><textarea class="notes-textarea" id="para-area" placeholder="Paragraphes visités, chemins explorés…" style="min-height:100px;" oninput="save()"></textarea></div>
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ─── State ───
-let state = {
-  name: '', title: '', book: '',
-  skill: 10, skillMax: 12,
-  stamina: 20, staminaMax: 24,
-  luck: 9, luckMax: 10,
-  gold: 0,
-  meals: 10,
-  potions: 2,
-  potionsTotal: 2,
-  items: [],
-  notes: '', paras: '',
-  diceHistory: []
+// ══ EQUIPMENT SETS ══
+const EQUIP_SETS = {
+  guerrier: {
+    label: 'Guerrier',
+    meals: 10,
+    items: [
+      {name:'Épée',qty:1},{name:'Bouclier en cuir',qty:1},
+      {name:'Lanterne + huile',qty:1},{name:'Sac à dos',qty:1},
+      {name:'Corde (5m)',qty:1}
+    ]
+  },
+  archer: {
+    label: 'Rôdeur',
+    meals: 8,
+    items: [
+      {name:'Épée courte',qty:1},{name:'Arc',qty:1},
+      {name:'Flèches',qty:8},{name:'Carquois',qty:1},
+      {name:'Lanterne',qty:1},{name:'Sac à dos',qty:1}
+    ]
+  },
+  mage: {
+    label: 'Aventurier Érudit',
+    meals: 8,
+    items: [
+      {name:'Dague',qty:1},{name:'Bâton',qty:1},
+      {name:'Livre de sorts vierge',qty:1},{name:'Lanterne',qty:1},
+      {name:'Sac à dos',qty:1},{name:'Parchemin vierge',qty:3}
+    ]
+  }
 };
 
-// ─── Init ───
+// ══ STATE ══
+let state = {
+  name:'',book:'',
+  skill:10,skillMax:12,
+  stamina:20,staminaMax:24,
+  luck:9,luckMax:10,
+  gold:0,meals:10,
+  potions:1,potionsTotal:1,
+  items:[],notes:'',paras:'',diceHistory:[]
+};
+
+// ══ WIZARD STATE ══
+let wiz = {
+  step: 0,
+  name:'', book:'',
+  skill: null, skillRolled: false,
+  stamina: null, staminaRolled: false,
+  luck: null, luckRolled: false,
+  gold: null, goldRolled: false,
+  equip: 'guerrier'
+};
+const TOTAL_STEPS = 7;
+
 function init() {
-  const saved = localStorage.getItem('defi-fantastique-v1');
-  if (saved) try { state = JSON.parse(saved); } catch(e) {}
-  render();
+  const saved = localStorage.getItem('defi-fantastique-v2');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      state = parsed;
+      // If we have a saved character, skip wizard
+      if (state.name) {
+        document.getElementById('wizard').style.display = 'none';
+        render();
+        return;
+      }
+    } catch(e) {}
+  }
+  // Show wizard
+  wizGo(0);
 }
 
 function save() {
   state.name = document.getElementById('char-name').value;
-  state.title = document.getElementById('char-title').value;
   state.book = document.getElementById('char-book').value;
   state.notes = document.getElementById('notes-area').value;
   state.paras = document.getElementById('para-area').value;
-  localStorage.setItem('defi-fantastique-v1', JSON.stringify(state));
+  localStorage.setItem('defi-fantastique-v2', JSON.stringify(state));
+  updateHeader();
+}
+
+function updateHeader() {
+  const n = state.name || '';
+  const b = state.book || '';
+  document.getElementById('header-hero-name').textContent = n;
+  document.getElementById('header-book-sub').textContent = b || 'Fiche de Personnage';
 }
 
 function render() {
   document.getElementById('char-name').value = state.name;
-  document.getElementById('char-title').value = state.title;
   document.getElementById('char-book').value = state.book;
-  document.getElementById('notes-area').value = state.notes;
-  document.getElementById('para-area').value = state.paras;
-
+  document.getElementById('notes-area').value = state.notes || '';
+  document.getElementById('para-area').value = state.paras || '';
   document.getElementById('skill-val').textContent = state.skill;
   document.getElementById('stamina-val').textContent = state.stamina;
   document.getElementById('luck-val').textContent = state.luck;
   document.getElementById('skill-max').textContent = state.skillMax;
   document.getElementById('stamina-max').textContent = state.staminaMax;
   document.getElementById('luck-max').textContent = state.luckMax;
-  document.getElementById('skill-max-in').value = state.skillMax;
-  document.getElementById('stamina-max-in').value = state.staminaMax;
-  document.getElementById('luck-max-in').value = state.luckMax;
-
-  // HP bar
-  const pct = Math.max(0, Math.min(100, Math.round(state.stamina / state.staminaMax * 100)));
+  const pct = Math.max(0,Math.min(100,Math.round(state.stamina/state.staminaMax*100)));
   const bar = document.getElementById('hp-bar');
-  bar.style.width = pct + '%';
-  bar.style.background = pct > 50
-    ? `linear-gradient(90deg, #2d8a58, #5aab3a)`
-    : pct > 25
-      ? `linear-gradient(90deg, #c9a84c, #e8c96b)`
-      : `linear-gradient(90deg, #8b1a1a, #c9453a)`;
-
+  bar.style.width = pct+'%';
+  bar.style.background = pct>50?'linear-gradient(90deg,#2d8a58,#5aab3a)':pct>25?'linear-gradient(90deg,#c9a84c,#e8c96b)':'linear-gradient(90deg,#8b1a1a,#c9453a)';
   document.getElementById('gold-val').textContent = state.gold;
   document.getElementById('meals-val').textContent = state.meals;
-
   // Potions
   const pip = document.getElementById('potion-pips');
   pip.innerHTML = '';
-  for (let i = 0; i < state.potionsTotal; i++) {
-    const d = document.createElement('div');
-    d.className = 'potion-pip ' + (i < state.potions ? 'full' : 'used');
-    d.title = i < state.potions ? 'Potion disponible' : 'Utilisée';
+  for(let i=0;i<state.potionsTotal;i++){
+    const d=document.createElement('div');
+    d.className='potion-pip '+(i<state.potions?'full':'used');
     pip.appendChild(d);
   }
-
   // Items
   const list = document.getElementById('item-list');
-  list.innerHTML = state.items.length === 0
-    ? '<li style="color:var(--ink-light);font-size:13px;font-style:italic;padding:8px 0;">Aucun objet…</li>'
-    : '';
-  state.items.forEach((item, i) => {
-    const li = document.createElement('li');
-    li.className = 'item-entry';
-    li.innerHTML = `
-      <span class="item-icon">${itemIcon(item.name)}</span>
-      <span class="item-name">${esc(item.name)}</span>
-      ${item.qty > 1 ? `<span class="item-qty">×${item.qty}</span>` : ''}
-      <button class="item-del" onclick="removeItem(${i})">✕</button>
-    `;
+  list.innerHTML = state.items.length===0?'<li style="color:var(--ink-light);font-size:13px;font-style:italic;padding:8px 0;">Aucun objet…</li>':'';
+  state.items.forEach((item,i)=>{
+    const li=document.createElement('li');
+    li.className='item-entry';
+    li.innerHTML=`<span class="item-icon">${itemIcon(item.name)}</span><span class="item-name">${esc(item.name)}</span>${item.qty>1?`<span class="item-qty">×${item.qty}</span>`:''}<button class="item-del" onclick="removeItem(${i})">✕</button>`;
     list.appendChild(li);
+  });
+  updateHeader();
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function itemIcon(name){
+  const n=name.toLowerCase();
+  if(/épée|sabre|lame|dague|couteau|hache|massue|arme/.test(n))return'⚔️';
+  if(/bouclier|armure|casque|cuirasse/.test(n))return'🛡';
+  if(/potion|fiole|élixir|remède/.test(n))return'🧪';
+  if(/livre|parchemin|carte|lettre|note|sort/.test(n))return'📜';
+  if(/clé|clef/.test(n))return'🗝';
+  if(/lampe|torche|lanterne/.test(n))return'🕯';
+  if(/corde/.test(n))return'🪢';
+  if(/flèche|arc/.test(n))return'🏹';
+  if(/bâton|staff/.test(n))return'🪄';
+  if(/anneau|bague|amulette/.test(n))return'💍';
+  if(/or|pièce|monnaie/.test(n))return'🪙';
+  return'🎒';
+}
+
+// ══ WIZARD LOGIC ══
+function wizGo(step) {
+  wiz.step = step;
+  document.querySelectorAll('.wiz-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('wiz-'+step).classList.add('active');
+  // Progress dots
+  for(let i=0;i<TOTAL_STEPS;i++){
+    const d=document.getElementById('dot-'+i);
+    d.classList.remove('active','done');
+    if(i<step) d.classList.add('done');
+    else if(i===step) d.classList.add('active');
+  }
+  // Buttons
+  const btnBack = document.getElementById('btn-back');
+  const btnRoll = document.getElementById('btn-roll');
+  const btnNext = document.getElementById('btn-next');
+  const btnFinish = document.getElementById('btn-finish');
+  btnBack.style.display = step>0?'block':'none';
+  btnRoll.style.display = 'none';
+  btnNext.style.display = 'none';
+  btnFinish.style.display = 'none';
+
+  if(step===0) { btnNext.style.display='block'; btnNext.textContent='Créer mon héros →'; }
+  else if(step===1) { btnNext.style.display='block'; btnNext.textContent='Suivant →'; }
+  else if(step===2) {
+    btnRoll.style.display='block'; btnRoll.textContent='🎲 Lancer (1d6+6)';
+    if(wiz.skill!==null){ btnRoll.style.display=wiz.skillRolled?'none':'block'; btnNext.style.display=wiz.skill!==null?'block':'none'; btnNext.textContent='Garder '+wiz.skill+' →'; }
+  }
+  else if(step===3) {
+    btnRoll.style.display='block'; btnRoll.textContent='🎲 Lancer (2d6+12)';
+    if(wiz.stamina!==null){ btnRoll.style.display=wiz.staminaRolled?'none':'block'; btnNext.style.display='block'; btnNext.textContent='Garder '+wiz.stamina+' →'; }
+  }
+  else if(step===4) {
+    btnRoll.style.display='block'; btnRoll.textContent='🎲 Lancer (1d6+6)';
+    if(wiz.luck!==null){ btnRoll.style.display=wiz.luckRolled?'none':'block'; btnNext.style.display='block'; btnNext.textContent='Garder '+wiz.luck+' →'; }
+  }
+  else if(step===5) {
+    btnRoll.style.display = wiz.goldRolled?'none':'block';
+    btnRoll.textContent='🎲 Lancer l\'or (1d6×10)';
+    btnNext.style.display = wiz.goldRolled?'block':'none';
+    btnNext.textContent='Voir le résumé →';
+  }
+  else if(step===6) {
+    buildSummary();
+    btnFinish.style.display='block';
+  }
+}
+
+function wizNext() {
+  const step = wiz.step;
+  if(step===1) {
+    const nm = document.getElementById('wiz-name').value.trim();
+    if(!nm){ toast('⚠ Entrez un nom pour votre héros !'); return; }
+    wiz.name = nm;
+    wiz.book = document.getElementById('wiz-book').value.trim() || 'Livre sans titre';
+  }
+  if(step===2 && wiz.skill===null){ toast('🎲 Lancez les dés d\'abord !'); return; }
+  if(step===3 && wiz.stamina===null){ toast('🎲 Lancez les dés d\'abord !'); return; }
+  if(step===4 && wiz.luck===null){ toast('🎲 Lancez les dés d\'abord !'); return; }
+  if(step===5 && wiz.gold===null){ toast('🎲 Déterminez votre or d\'abord !'); return; }
+  wizGo(step+1);
+}
+
+function wizBack() {
+  wizGo(Math.max(0, wiz.step-1));
+}
+
+function d6(){ return Math.floor(Math.random()*6)+1; }
+
+function animDie(elId, finalVal, delay, cb) {
+  const el = document.getElementById(elId);
+  if(!el) { if(cb) setTimeout(cb,0); return; }
+  el.classList.add('rolling');
+  let t=0; const interval=setInterval(()=>{ el.textContent=Math.floor(Math.random()*6)+1; t+=60; if(t>400){clearInterval(interval);el.textContent=finalVal;el.classList.remove('rolling');if(cb)cb();}},60);
+}
+
+function wizRoll() {
+  const step = wiz.step;
+  if(step===2) rollSkill();
+  else if(step===3) rollStamina();
+  else if(step===4) rollLuck();
+  else if(step===5) rollGold();
+}
+
+function rollSkill() {
+  const r = d6();
+  const total = r + 6;
+  animDie('wiz-d-skill', r, 0, ()=>{
+    document.getElementById('wiz-skill-roll').textContent = total;
+    wiz.skill = total;
+    if(!wiz.skillRolled) {
+      wiz.skillRolled = false; // first roll
+      document.getElementById('wiz-skill-reroll-hint').style.display='block';
+      document.getElementById('btn-roll').textContent='🎲 Relancer une fois';
+      document.getElementById('btn-next').style.display='block';
+      document.getElementById('btn-next').textContent='Garder '+total+' →';
+      wiz.skillRolled = true; // mark: one roll done, allow one more
+    } else {
+      // second roll — lock
+      document.getElementById('wiz-skill-reroll-hint').style.display='none';
+      document.getElementById('btn-roll').style.display='none';
+      document.getElementById('btn-next').style.display='block';
+      document.getElementById('btn-next').textContent='Garder '+total+' →';
+    }
   });
 }
 
-function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function itemIcon(name) {
-  const n = name.toLowerCase();
-  if (/épée|sabre|lame|dague|couteau|hache|massue|arme/.test(n)) return '⚔️';
-  if (/bouclier|armure|casque|cuirasse/.test(n)) return '🛡';
-  if (/potion|fiole|élixir|remède/.test(n)) return '🧪';
-  if (/livre|parchemin|carte|lettre|note/.test(n)) return '📜';
-  if (/clé|clef/.test(n)) return '🗝';
-  if (/lampe|torche|lanterne/.test(n)) return '🕯';
-  if (/corde/.test(n)) return '🪢';
-  if (/flèche|arc/.test(n)) return '🏹';
-  if (/anneau|bague|amulette/.test(n)) return '💍';
-  if (/or|pièce|monnaie/.test(n)) return '🪙';
-  return '🎒';
+function rollStamina() {
+  const r1=d6(), r2=d6();
+  const total = r1+r2+12;
+  animDie('wiz-d-stamina1',r1,0,()=>{
+    animDie('wiz-d-stamina2',r2,0,()=>{
+      document.getElementById('wiz-stamina-roll').textContent=total;
+      wiz.stamina=total;
+      if(!wiz.staminaRolled){
+        document.getElementById('wiz-stamina-reroll-hint').style.display='block';
+        document.getElementById('btn-roll').textContent='🎲 Relancer une fois';
+        document.getElementById('btn-next').style.display='block';
+        document.getElementById('btn-next').textContent='Garder '+total+' →';
+        wiz.staminaRolled=true;
+      } else {
+        document.getElementById('wiz-stamina-reroll-hint').style.display='none';
+        document.getElementById('btn-roll').style.display='none';
+        document.getElementById('btn-next').style.display='block';
+        document.getElementById('btn-next').textContent='Garder '+total+' →';
+      }
+    });
+  });
 }
 
-// ─── Stats ───
-function changeStat(stat, delta) {
-  const maxKey = stat + 'Max';
-  state[stat] = Math.max(0, Math.min(state[maxKey], state[stat] + delta));
-  render(); save();
-  if (stat === 'stamina' && state.stamina === 0) toast('💀 Votre personnage est mort !');
-}
-
-function setMax(stat) {
-  const v = parseInt(document.getElementById(stat+'-max-in').value) || 1;
-  state[stat+'Max'] = v;
-  if (state[stat] > v) state[stat] = v;
-  render(); save();
-}
-
-// ─── Potions ───
-function addPotion() { state.potionsTotal++; state.potions++; render(); save(); }
-function removePotion() {
-  if (state.potionsTotal > 0) {
-    if (state.potions >= state.potionsTotal) state.potions--;
-    state.potionsTotal--;
-    render(); save();
-  }
-}
-function drinkPotion() {
-  if (state.potions <= 0) { toast('Plus de potion !'); return; }
-  state.potions--;
-  state.stamina = state.staminaMax;
-  render(); save();
-  toast('🧪 Endurance restaurée à ' + state.staminaMax + ' !');
-}
-
-// ─── Gold / Meals ───
-function changeGold(d) { state.gold = Math.max(0, state.gold + d); render(); save(); }
-function changeMeals(d) { state.meals = Math.max(0, state.meals + d); render(); save(); }
-function eatMeal() {
-  if (state.meals <= 0) { toast('Plus de provisions !'); return; }
-  state.meals--;
-  const gain = Math.min(4, state.staminaMax - state.stamina);
-  state.stamina = Math.min(state.staminaMax, state.stamina + 4);
-  render(); save();
-  toast('🍖 +' + gain + ' Endurance (total : ' + state.stamina + ')');
-}
-
-// ─── Items ───
-function addItem() {
-  const input = document.getElementById('item-input');
-  const qtyIn = document.getElementById('qty-input');
-  const name = input.value.trim();
-  if (!name) return;
-  const qty = parseInt(qtyIn.value) || 1;
-  const existing = state.items.find(i => i.name.toLowerCase() === name.toLowerCase());
-  if (existing) { existing.qty += qty; }
-  else { state.items.push({ name, qty }); }
-  input.value = ''; qtyIn.value = 1;
-  render(); save();
-}
-function removeItem(i) { state.items.splice(i, 1); render(); save(); }
-
-// ─── Dice ───
-function d6() { return Math.floor(Math.random() * 6) + 1; }
-
-function rollDice(n) {
-  const dice = Array.from({length:n}, d6);
-  const total = dice.reduce((a,b)=>a+b,0);
-
-  const d1El = document.getElementById('die1');
-  const d2El = document.getElementById('die2');
-  d1El.classList.add('rolling'); d2El.classList.add('rolling');
-  setTimeout(() => {
-    d1El.textContent = dice[0];
-    d2El.textContent = n > 1 ? dice[1] : '–';
-    document.getElementById('dice-total').textContent = total;
-    document.getElementById('dice-label').textContent = n === 2 ? 'Total (2d6)' : '1d6';
-    d1El.classList.remove('rolling'); d2El.classList.remove('rolling');
-  }, 500);
-
-  const entry = `🎲 ${n}d6 → [${dice.join(', ')}] = <strong>${total}</strong>`;
-  addHistory(entry);
-  return { dice, total };
-}
-
-function testLuck() {
-  const roll = d6() + d6();
-  const lucky = roll <= state.luck;
-  const old = state.luck;
-  state.luck = Math.max(0, state.luck - 1);
-
-  const el = document.getElementById('luck-result');
-  if (lucky) {
-    el.textContent = '✨ CHANCEUX !';
-    el.style.color = '#1a5c3a';
-  } else {
-    el.textContent = '💀 MALCHANCEUX…';
-    el.style.color = '#8b1a1a';
-  }
-
-  addHistory(`🍀 Chance: ${roll} vs ${old} → ${lucky ? 'Chanceux ✨' : 'Malchanceux 💀'}`);
-  render(); save();
-}
-
-function addHistory(entry) {
-  state.diceHistory.unshift(entry);
-  if (state.diceHistory.length > 20) state.diceHistory.pop();
-  document.getElementById('dice-history').innerHTML = state.diceHistory.slice(0,10).map(e => `<div>${e}</div>`).join('');
-}
-
-function clearHistory() {
-  state.diceHistory = [];
-  document.getElementById('dice-history').innerHTML = '';
-}
-
-// ─── Combat ───
-let combatEnemyStamina = 0;
-
-function combatRound() {
-  const enemyName = document.getElementById('enemy-name').value || 'Adversaire';
-  const enemySkill = parseInt(document.getElementById('enemy-skill').value) || 7;
-  if (combatEnemyStamina === 0) {
-    combatEnemyStamina = parseInt(document.getElementById('enemy-stamina').value) || 10;
-  }
-
-  if (state.stamina <= 0) { addLog('💀 Vous êtes mort.', 'dmg'); return; }
-  if (combatEnemyStamina <= 0) { addLog('🏆 Adversaire déjà vaincu !', 'info'); return; }
-
-  const heroRoll = d6() + d6();
-  const enemyRoll = d6() + d6();
-  const heroFA = heroRoll + state.skill;
-  const enemyFA = enemyRoll + enemySkill;
-
-  addLog(`⚔ Votre FA : ${heroRoll} + ${state.skill} = ${heroFA} | ${enemyName} FA : ${enemyRoll} + ${enemySkill} = ${enemyFA}`, 'info');
-
-  if (heroFA > enemyFA) {
-    combatEnemyStamina -= 2;
-    if (combatEnemyStamina < 0) combatEnemyStamina = 0;
-    addLog(`✅ Vous touchez ${enemyName} ! (End. restante : ${combatEnemyStamina})`, 'miss');
-    if (combatEnemyStamina <= 0) {
-      addLog(`🏆 ${enemyName} est vaincu !`, 'heal');
-      toast('🏆 Victoire ! ' + enemyName + ' est vaincu !');
+function rollLuck() {
+  const r=d6(); const total=r+6;
+  animDie('wiz-d-luck',r,0,()=>{
+    document.getElementById('wiz-luck-roll').textContent=total;
+    wiz.luck=total;
+    if(!wiz.luckRolled){
+      document.getElementById('wiz-luck-reroll-hint').style.display='block';
+      document.getElementById('btn-roll').textContent='🎲 Relancer une fois';
+      document.getElementById('btn-next').style.display='block';
+      document.getElementById('btn-next').textContent='Garder '+total+' →';
+      wiz.luckRolled=true;
+    } else {
+      document.getElementById('wiz-luck-reroll-hint').style.display='none';
+      document.getElementById('btn-roll').style.display='none';
+      document.getElementById('btn-next').style.display='block';
+      document.getElementById('btn-next').textContent='Garder '+total+' →';
     }
-  } else if (enemyFA > heroFA) {
-    state.stamina = Math.max(0, state.stamina - 2);
-    addLog(`❌ ${enemyName} vous blesse ! (Votre End. : ${state.stamina})`, 'hit');
-    if (state.stamina <= 0) {
-      addLog(`💀 Vous êtes mort…`, 'dmg');
-      toast('💀 Vous avez péri au combat !');
-    }
-    render(); save();
-  } else {
-    addLog(`🔄 Égalité ! Les deux combattants esquivent.`, 'info');
-  }
+  });
 }
 
-function fightLuck() {
-  const roll = d6() + d6();
-  const lucky = roll <= state.luck;
-  state.luck = Math.max(0, state.luck - 1);
-  const enemyName = document.getElementById('enemy-name').value || 'Adversaire';
+function rollGold() {
+  const r=d6(); const total=r*10;
+  animDie('wiz-d-gold',r,0,()=>{
+    document.getElementById('wiz-gold-roll').textContent=total;
+    document.getElementById('wiz-gold-label').textContent=total+' Pièces d\'Or';
+    wiz.gold=total;
+    wiz.goldRolled=true;
+    document.getElementById('btn-roll').style.display='none';
+    document.getElementById('btn-next').style.display='block';
+    document.getElementById('btn-next').textContent='Voir le résumé →';
+  });
+}
 
-  if (lucky) {
-    combatEnemyStamina = Math.max(0, combatEnemyStamina - 2);
-    addLog(`🍀 Chanceux ! ${enemyName} subit 2 dégâts supplémentaires. (End. : ${combatEnemyStamina})`, 'heal');
-  } else {
-    state.stamina = Math.max(0, state.stamina - 1);
-    addLog(`💀 Malchanceux ! Vous subissez 1 dégât. (Votre End. : ${state.stamina})`, 'hit');
-  }
+function selectEquip(el) {
+  document.querySelectorAll('.equip-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  wiz.equip = el.dataset.equip;
+}
+
+function buildSummary() {
+  const eq = EQUIP_SETS[wiz.equip];
+  document.getElementById('sum-skill').textContent = wiz.skill;
+  document.getElementById('sum-stamina').textContent = wiz.stamina;
+  document.getElementById('sum-luck').textContent = wiz.luck;
+  document.getElementById('sum-name').textContent = wiz.name;
+  document.getElementById('sum-book').textContent = wiz.book;
+  document.getElementById('sum-equip').textContent = eq.label+' — '+eq.items.map(i=>i.qty>1?i.name+' ×'+i.qty:i.name).join(', ');
+  document.getElementById('sum-gold').textContent = wiz.gold+' PO';
+  document.getElementById('sum-meals').textContent = eq.meals+' provisions';
+}
+
+function wizFinish() {
+  const eq = EQUIP_SETS[wiz.equip];
+  state = {
+    name: wiz.name,
+    book: wiz.book,
+    skill: wiz.skill, skillMax: wiz.skill,
+    stamina: wiz.stamina, staminaMax: wiz.stamina,
+    luck: wiz.luck, luckMax: wiz.luck,
+    gold: wiz.gold,
+    meals: eq.meals,
+    potions: 1, potionsTotal: 1,
+    items: JSON.parse(JSON.stringify(eq.items)),
+    notes: '', paras: '',
+    diceHistory: []
+  };
+  localStorage.setItem('defi-fantastique-v2', JSON.stringify(state));
+  document.getElementById('wizard').style.display='none';
+  render();
+  toast('⚔️ Que l\'aventure commence, '+state.name+' !');
+}
+
+function reopenWizard() {
+  if(!confirm('Créer un nouveau personnage ? La fiche actuelle sera effacée.')) return;
+  localStorage.removeItem('defi-fantastique-v2');
+  wiz = {step:0,name:'',book:'',skill:null,skillRolled:false,stamina:null,staminaRolled:false,luck:null,luckRolled:false,gold:null,goldRolled:false,equip:'guerrier'};
+  // Reset wizard UI
+  document.getElementById('wiz-skill-roll').textContent='–';
+  document.getElementById('wiz-d-skill').textContent='?';
+  document.getElementById('wiz-stamina-roll').textContent='–';
+  document.getElementById('wiz-d-stamina1').textContent='?';
+  document.getElementById('wiz-d-stamina2').textContent='?';
+  document.getElementById('wiz-luck-roll').textContent='–';
+  document.getElementById('wiz-d-luck').textContent='?';
+  document.getElementById('wiz-gold-roll').textContent='–';
+  document.getElementById('wiz-d-gold').textContent='?';
+  document.getElementById('wiz-gold-label').textContent='Pièces d\'or';
+  document.getElementById('wiz-skill-reroll-hint').style.display='none';
+  document.getElementById('wiz-stamina-reroll-hint').style.display='none';
+  document.getElementById('wiz-luck-reroll-hint').style.display='none';
+  document.getElementById('wiz-name').value='';
+  document.getElementById('wiz-book').value='';
+  document.querySelectorAll('.equip-opt').forEach((o,i)=>o.classList.toggle('selected',i===0));
+  document.getElementById('wizard').style.display='flex';
+  wizGo(0);
+}
+
+// ══ MAIN APP FUNCTIONS ══
+function changeStat(stat,delta){
+  const maxKey=stat+'Max';
+  state[stat]=Math.max(0,Math.min(state[maxKey],state[stat]+delta));
   render(); save();
+  if(stat==='stamina'&&state.stamina===0) toast('💀 Votre personnage est mort !');
+}
+function addPotion(){state.potionsTotal++;state.potions++;render();save();}
+function removePotion(){if(state.potionsTotal>0){if(state.potions>=state.potionsTotal)state.potions--;state.potionsTotal--;render();save();}}
+function drinkPotion(){if(state.potions<=0){toast('Plus de potion !');return;}state.potions--;state.stamina=state.staminaMax;render();save();toast('🧪 Endurance restaurée à '+state.staminaMax+' !');}
+function changeGold(d){state.gold=Math.max(0,state.gold+d);render();save();}
+function changeMeals(d){state.meals=Math.max(0,state.meals+d);render();save();}
+function eatMeal(){if(state.meals<=0){toast('Plus de provisions !');return;}state.meals--;const gain=Math.min(4,state.staminaMax-state.stamina);state.stamina=Math.min(state.staminaMax,state.stamina+4);render();save();toast('🍖 +'+gain+' Endurance (total : '+state.stamina+')');}
+function addItem(){const input=document.getElementById('item-input');const qtyIn=document.getElementById('qty-input');const name=input.value.trim();if(!name)return;const qty=parseInt(qtyIn.value)||1;const existing=state.items.find(i=>i.name.toLowerCase()===name.toLowerCase());if(existing){existing.qty+=qty;}else{state.items.push({name,qty});}input.value='';qtyIn.value=1;render();save();}
+function removeItem(i){state.items.splice(i,1);render();save();}
+
+function rollDice(n){
+  const dice=Array.from({length:n},d6);
+  const total=dice.reduce((a,b)=>a+b,0);
+  const d1El=document.getElementById('die1');
+  const d2El=document.getElementById('die2');
+  d1El.classList.add('rolling');d2El.classList.add('rolling');
+  setTimeout(()=>{d1El.textContent=dice[0];d2El.textContent=n>1?dice[1]:'–';document.getElementById('dice-total').textContent=total;document.getElementById('dice-label').textContent=n===2?'Total (2d6)':'1d6';d1El.classList.remove('rolling');d2El.classList.remove('rolling');},500);
+  addHistory(`🎲 ${n}d6 → [${dice.join(', ')}] = <strong>${total}</strong>`);
+  return{dice,total};
 }
 
-function addLog(msg, cls) {
-  const log = document.getElementById('combat-log');
-  const div = document.createElement('div');
-  div.className = 'log-entry ' + (cls || '');
-  div.innerHTML = msg;
-  log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
+function testLuck(){
+  const roll=d6()+d6();const lucky=roll<=state.luck;const old=state.luck;
+  state.luck=Math.max(0,state.luck-1);
+  const el=document.getElementById('luck-result');
+  if(lucky){el.textContent='✨ CHANCEUX !';el.style.color='#1a5c3a';}
+  else{el.textContent='💀 MALCHANCEUX…';el.style.color='#8b1a1a';}
+  addHistory(`🍀 Chance: ${roll} vs ${old} → ${lucky?'Chanceux ✨':'Malchanceux 💀'}`);
+  render();save();
+}
+function addHistory(entry){state.diceHistory.unshift(entry);if(state.diceHistory.length>20)state.diceHistory.pop();document.getElementById('dice-history').innerHTML=state.diceHistory.slice(0,10).map(e=>`<div>${e}</div>`).join('');}
+function clearHistory(){state.diceHistory=[];document.getElementById('dice-history').innerHTML='';}
+
+let combatEnemyStamina=0;
+let modHero=0, modEnemy=0;
+
+function changeMod(who, delta){
+  if(who==='hero') modHero=Math.max(-10,Math.min(10,modHero+delta));
+  else modEnemy=Math.max(-10,Math.min(10,modEnemy+delta));
+  renderMods();
+}
+function setMod(who, val){
+  if(who==='hero') modHero=val;
+  else modEnemy=val;
+  renderMods();
+}
+function renderMods(){
+  const hEl=document.getElementById('mod-hero-val');
+  const eEl=document.getElementById('mod-enemy-val');
+  hEl.textContent=(modHero>0?'+':'')+modHero;
+  hEl.className='mod-val '+(modHero>0?'positive':modHero<0?'negative':'zero');
+  eEl.textContent=(modEnemy>0?'+':'')+modEnemy;
+  eEl.className='mod-val '+(modEnemy>0?'positive':modEnemy<0?'negative':'zero');
+
+  // Badge résumé
+  const badge=document.getElementById('mod-active-badge');
+  const parts=[];
+  if(modHero!==0) parts.push(`Vous : <strong style="color:${modHero>0?'var(--emerald)':'var(--blood-dark)'}">${modHero>0?'+':''}${modHero}</strong>`);
+  if(modEnemy!==0) parts.push(`Ennemi : <strong style="color:${modEnemy>0?'var(--emerald)':'var(--blood-dark)'}">${modEnemy>0?'+':''}${modEnemy}</strong>`);
+  badge.innerHTML = parts.length ? '⚗️ Modificateurs actifs — '+parts.join(' | ') : 'Aucun modificateur actif';
+  badge.style.fontStyle = parts.length?'normal':'italic';
+  badge.style.color = parts.length?'var(--ink)':'var(--ink-light)';
 }
 
-function resetCombat() {
-  combatEnemyStamina = 0;
-  document.getElementById('combat-log').innerHTML = '<div class="log-entry info">⚔ Prêt à combattre…</div>';
-  document.getElementById('enemy-stamina').value = '10';
-}
+function combatRound(){
+  const enemyName=document.getElementById('enemy-name').value||'Adversaire';
+  const enemySkill=parseInt(document.getElementById('enemy-skill').value)||7;
+  if(combatEnemyStamina===0){combatEnemyStamina=parseInt(document.getElementById('enemy-stamina').value)||10;}
+  if(state.stamina<=0){addLog('💀 Vous êtes mort.','dmg');return;}
+  if(combatEnemyStamina<=0){addLog('🏆 Adversaire déjà vaincu !','info');return;}
 
-// ─── Nav ───
-function showPanel(id) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-' + id).classList.add('active');
-  const tabs = ['stats','dice','combat','inventory','notes'];
-  const i = tabs.indexOf(id);
-  document.querySelectorAll('.nav-tab')[i].classList.add('active');
-}
+  const heroRoll=d6()+d6();
+  const enemyRoll=d6()+d6();
+  const heroFA=heroRoll+state.skill+modHero;
+  const enemyFA=enemyRoll+enemySkill+modEnemy;
 
-// ─── Toast ───
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2800);
-}
+  // Build log detail with modifiers shown
+  let heroDetail=`${heroRoll}+${state.skill}`;
+  if(modHero!==0) heroDetail+=`${modHero>0?'+':''}${modHero}`;
+  heroDetail+=`=<strong>${heroFA}</strong>`;
+  let enemyDetail=`${enemyRoll}+${enemySkill}`;
+  if(modEnemy!==0) enemyDetail+=`${modEnemy>0?'+':''}${modEnemy}`;
+  enemyDetail+=`=<strong>${enemyFA}</strong>`;
 
-// ─── Reset ───
-function resetConfirm() {
-  if (confirm('Effacer toute la partie et recommencer à zéro ?')) {
-    localStorage.removeItem('defi-fantastique-v1');
-    state = { name:'',title:'',book:'',skill:10,skillMax:12,stamina:20,staminaMax:24,luck:9,luckMax:10,gold:0,meals:10,potions:2,potionsTotal:2,items:[],notes:'',paras:'',diceHistory:[] };
-    render();
-    document.getElementById('combat-log').innerHTML = '<div class="log-entry info">⚔ Prêt à combattre…</div>';
-    toast('Nouvelle aventure commence !');
+  addLog(`⚔ Votre FA : ${heroDetail} | ${enemyName} FA : ${enemyDetail}`,'info');
+
+  if(heroFA>enemyFA){
+    combatEnemyStamina=Math.max(0,combatEnemyStamina-2);
+    addLog(`✅ Vous touchez ${enemyName} ! (End. restante : ${combatEnemyStamina})`,'miss');
+    if(combatEnemyStamina<=0){addLog(`🏆 ${enemyName} est vaincu !`,'heal');toast('🏆 Victoire ! '+enemyName+' est vaincu !');}
+  } else if(enemyFA>heroFA){
+    state.stamina=Math.max(0,state.stamina-2);
+    addLog(`❌ ${enemyName} vous blesse ! (Votre End. : ${state.stamina})`,'hit');
+    if(state.stamina<=0){addLog('💀 Vous êtes mort…','dmg');toast('💀 Vous avez péri au combat !');}
+    render();save();
+  } else {
+    addLog('🔄 Égalité ! Les deux combattants esquivent.','info');
   }
 }
+function fightLuck(){
+  const roll=d6()+d6();const lucky=roll<=state.luck;state.luck=Math.max(0,state.luck-1);
+  const enemyName=document.getElementById('enemy-name').value||'Adversaire';
+  if(lucky){combatEnemyStamina=Math.max(0,combatEnemyStamina-2);addLog(`🍀 Chanceux ! ${enemyName} subit 2 dégâts supplémentaires. (End. : ${combatEnemyStamina})`,'heal');}
+  else{state.stamina=Math.max(0,state.stamina-1);addLog(`💀 Malchanceux ! Vous subissez 1 dégât. (Votre End. : ${state.stamina})`,'hit');}
+  render();save();
+}
+function addLog(msg,cls){const log=document.getElementById('combat-log');const div=document.createElement('div');div.className='log-entry '+(cls||'');div.innerHTML=msg;log.appendChild(div);log.scrollTop=log.scrollHeight;}
+function resetCombat(){
+  combatEnemyStamina=0;
+  modHero=0; modEnemy=0;
+  renderMods();
+  document.getElementById('combat-log').innerHTML='<div class="log-entry info">⚔ Prêt à combattre…</div>';
+  document.getElementById('enemy-stamina').value='10';
+}
+
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  const tabs=['stats','dice','combat','inventory','notes'];
+  document.querySelectorAll('.nav-tab')[tabs.indexOf(id)].classList.add('active');
+}
+
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
 
 init();
 </script>
