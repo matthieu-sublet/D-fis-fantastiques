@@ -188,6 +188,28 @@
 
   .wiz-reopen-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);color:var(--gold);font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;padding:5px 9px;border-radius:3px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 
+  /* ── NAME GENERATOR ── */
+  .btn-gen-name{width:44px;height:44px;flex-shrink:0;background:linear-gradient(180deg,#2d1500,#1a0a00);border:1.5px solid var(--gold-dark);border-radius:4px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:all .15s;}
+  .btn-gen-name:active{transform:scale(.92);}
+  .name-gen-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;min-height:0;}
+  .name-chip{padding:6px 12px;background:rgba(26,15,0,.06);border:1px solid rgba(201,168,76,.3);border-radius:20px;font-family:'EB Garamond',serif;font-size:14px;color:var(--ink);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+  .name-chip:hover,.name-chip:active{background:rgba(201,168,76,.15);border-color:var(--gold);transform:scale(.97);}
+
+  /* ── BOOK PICKER ── */
+  .book-search-wrap{position:relative;margin-bottom:8px;}
+  .book-search-input{width:100%;padding:9px 12px;background:rgba(240,228,200,.8);border:1.5px solid var(--gold-dark);border-radius:4px;font-family:'EB Garamond',serif;font-size:14px;color:var(--ink);outline:none;}
+  .book-search-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.15);}
+  .book-list{max-height:220px;overflow-y:auto;border:1px solid rgba(201,168,76,.25);border-radius:4px;background:rgba(242,232,208,.5);}
+  .book-list::-webkit-scrollbar{width:3px;}
+  .book-list::-webkit-scrollbar-thumb{background:var(--gold-dark);border-radius:2px;}
+  .book-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid rgba(201,168,76,.15);cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent;}
+  .book-item:last-child{border-bottom:none;}
+  .book-item:active,.book-item.selected{background:rgba(201,168,76,.18);}
+  .book-item.selected{border-left:3px solid var(--gold-dark);}
+  .book-num{font-family:'Cinzel Decorative',cursive;font-size:13px;color:var(--gold-dark);min-width:28px;flex-shrink:0;}
+  .book-title{font-family:'EB Garamond',serif;font-size:14px;color:var(--ink);line-height:1.3;}
+  .book-sub{font-size:11px;color:var(--ink-light);}
+
   /* ── COMBAT MODIFIERS ── */
   .mod-section{background:rgba(26,15,0,.05);border:1px solid rgba(201,168,76,.25);border-radius:4px;padding:12px 14px;margin-bottom:12px;}
   .mod-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
@@ -265,12 +287,30 @@
           <div class="wiz-intro">
             <div class="wiz-intro-icon">📖</div>
             <h2>Votre Identité</h2>
-            <p>Comment s'appelle votre héros ? Quel livre allez-vous affronter ?</p>
+            <p>Choisissez le nom de votre héros et le livre que vous allez affronter.</p>
           </div>
-          <input class="name-input" id="wiz-name" type="text" placeholder="Nom du personnage…" maxlength="30">
-          <input class="name-input book-input" id="wiz-book" type="text" placeholder="Titre ou numéro du livre…" maxlength="60">
-          <div class="rule-box" style="margin-top:8px;">
-            Votre nom n'affecte pas vos statistiques, mais chaque héros mérite une identité digne de la légende qu'il va forger.
+
+          <!-- Nom + générateur -->
+          <div style="margin-bottom:6px;">
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px;">Nom du héros</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input class="name-input" id="wiz-name" type="text" placeholder="Nom du personnage…" maxlength="30" style="margin:0;flex:1;">
+              <button class="btn-gen-name" onclick="generateName()" title="Générer un nom aléatoire">🎲</button>
+            </div>
+            <div class="name-gen-chips" id="name-suggestions"></div>
+          </div>
+
+          <!-- Sélecteur de livre -->
+          <div style="margin-top:16px;">
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px;">Livre Défi Fantastique</div>
+            <div class="book-search-wrap">
+              <input class="book-search-input" id="book-search" type="text" placeholder="🔍 Rechercher un titre ou numéro…" oninput="filterBooks(this.value)">
+            </div>
+            <div class="book-list" id="book-list"></div>
+            <div style="margin-top:8px;">
+              <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);margin-bottom:4px;">Ou saisir manuellement</div>
+              <input class="name-input book-input" id="wiz-book" type="text" placeholder="Titre personnalisé…" maxlength="80" style="margin:0;">
+            </div>
           </div>
         </div>
 
@@ -760,6 +800,7 @@ function init() {
   }
   // Show wizard
   wizGo(0);
+  initWizardUI();
 }
 
 function save() {
@@ -1054,9 +1095,13 @@ function reopenWizard() {
   document.getElementById('wiz-luck-reroll-hint').style.display='none';
   document.getElementById('wiz-name').value='';
   document.getElementById('wiz-book').value='';
+  document.getElementById('book-search').value='';
+  document.getElementById('name-suggestions').innerHTML='';
+  selectedBookIdx=-1;
   document.querySelectorAll('.equip-opt').forEach((o,i)=>o.classList.toggle('selected',i===0));
   document.getElementById('wizard').style.display='flex';
   wizGo(0);
+  initWizardUI();
 }
 
 // ══ MAIN APP FUNCTIONS ══
@@ -1189,6 +1234,149 @@ function showPanel(id){
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
+
+// ══ NAME GENERATOR ══
+const NAME_PARTS = {
+  prefix: ['Ald','Bra','Cal','Dor','Eld','Fal','Gar','Hal','Ith','Jor','Kel','Lor','Mal','Nor','Orn','Pel','Ran','Sor','Tal','Vor','Wyn','Zar','Aer','Bel','Cyn','Dar','Even','Fir','Gwen','Hael'],
+  mid:    ['an','ar','en','or','al','in','on','el','ath','iel','wyn','mir','dan','gar','dor','ven','bar','tor','sel','mar'],
+  suffix: ['dor','mir','wyn','las','rand','iel','ion','ath','ryn','gar','thor','ven','dal','sur','rath','bor','sel','nar','diel','orn'],
+  titles: ['le Brave','le Téméraire','la Courageuse','l\'Intrépide','la Valkyrie','le Chasseur','l\'Éclaireur','la Guerrière','le Sage','l\'Ombre','le Forgeron','la Chasseresse','le Pèlerin','l\'Érudit','la Sentinelle'],
+  female: ['Aelindra','Sylvara','Myrène','Elowen','Ithilwen','Caladria','Nyriel','Selvaine','Thariel','Rysara','Briavel','Cenara','Fenwyn','Lyreith','Morwenna'],
+  male:   ['Aldric','Braxton','Caldor','Dorian','Elvaren','Falkor','Garreth','Halsten','Irvaan','Jorund','Keldar','Lorian','Malvern','Nordan','Orskel','Pelador','Randor','Sorvan','Taldris','Vorath']
+};
+
+function generateName() {
+  const suggestions = [];
+  // 3 noms composés
+  for(let i=0;i<3;i++){
+    const p=NAME_PARTS.prefix[Math.floor(Math.random()*NAME_PARTS.prefix.length)];
+    const s=NAME_PARTS.suffix[Math.floor(Math.random()*NAME_PARTS.suffix.length)];
+    suggestions.push(p+s);
+  }
+  // 2 noms prénoms avec titre aléatoire
+  const fIdx=Math.floor(Math.random()*NAME_PARTS.female.length);
+  const mIdx=Math.floor(Math.random()*NAME_PARTS.male.length);
+  const tIdx1=Math.floor(Math.random()*NAME_PARTS.titles.length);
+  const tIdx2=Math.floor(Math.random()*NAME_PARTS.titles.length);
+  suggestions.push(NAME_PARTS.female[fIdx]+' '+NAME_PARTS.titles[tIdx1]);
+  suggestions.push(NAME_PARTS.male[mIdx]+' '+NAME_PARTS.titles[tIdx2]);
+  // 1 nom court composé avec milieu
+  const p2=NAME_PARTS.prefix[Math.floor(Math.random()*NAME_PARTS.prefix.length)];
+  const m=NAME_PARTS.mid[Math.floor(Math.random()*NAME_PARTS.mid.length)];
+  suggestions.push(p2+m);
+
+  const container=document.getElementById('name-suggestions');
+  container.innerHTML='';
+  suggestions.forEach(n=>{
+    const chip=document.createElement('div');
+    chip.className='name-chip';
+    chip.textContent=n;
+    chip.onclick=()=>{
+      document.getElementById('wiz-name').value=n;
+      container.querySelectorAll('.name-chip').forEach(c=>c.style.fontWeight='normal');
+      chip.style.fontWeight='bold';
+    };
+    container.appendChild(chip);
+  });
+}
+
+// ══ BOOK LIST ══
+const BOOKS = [
+  {n:1,  t:'Le Sorcier de la Montagne de Feu'},
+  {n:2,  t:'La Citadelle du Chaos'},
+  {n:3,  t:'La Forêt de la Malédiction'},
+  {n:4,  t:'La Cité des Voleurs'},
+  {n:5,  t:'La Plaine des Ténèbres'},
+  {n:6,  t:'Le Manoir de l\'Enfer'},
+  {n:7,  t:'L\'Île du Roi Lézard'},
+  {n:8,  t:'Les Collines du Diable'},
+  {n:9,  t:'Le Marais du Désespoir'},
+  {n:10, t:'La Légende du Zagor'},
+  {n:11, t:'La Créature venue des profondeurs'},
+  {n:12, t:'La Forteresse de la Terreur'},
+  {n:13, t:'La Malédiction de la Momie'},
+  {n:14, t:'L\'Épée du Samouraï'},
+  {n:15, t:'L\'Antre de la Peur'},
+  {n:16, t:'La Galaxie Maudite'},
+  {n:17, t:'L\'Ennemi du Temps'},
+  {n:18, t:'L\'Autel des Dieux'},
+  {n:19, t:'Le Masque du Chaos'},
+  {n:20, t:'La Tombe des Rois'},
+  {n:21, t:'Le Château Mystérieux'},
+  {n:22, t:'Le Robot de Glace'},
+  {n:23, t:'L\'Horreur sur Titan'},
+  {n:24, t:'La Tour du Destin'},
+  {n:25, t:'Les Galères du Malheur'},
+  {n:26, t:'Le Labyrinthe de la Mort'},
+  {n:27, t:'L\'Arène des Ombres'},
+  {n:28, t:'La Prison du Mal'},
+  {n:29, t:'La Terre des Dieux'},
+  {n:30, t:'La Rébellion des Robots'},
+  {n:31, t:'Le Passage du Diable'},
+  {n:32, t:'Le Voleur d\'Âmes'},
+  {n:33, t:'Les Jungles de la Mort'},
+  {n:34, t:'L\'Île du Roi du Volcan'},
+  {n:35, t:'Le Talisman de la Mort'},
+  {n:36, t:'Le Chasseur de Primes'},
+  {n:37, t:'Le Guerrier d\'Acier'},
+  {n:38, t:'La Demeure des Morts'},
+  {n:39, t:'Revenge of the Vampire (Le Retour de Vampyr)'},
+  {n:40, t:'Les Donjons de Dragonlance'},
+  {n:41, t:'La Légende des Sept Serpents'},
+  {n:42, t:'Le Colosse de Mahaka'},
+  {n:43, t:'La Montagne du Druide'},
+  {n:44, t:'Temple of Terror (Le Temple de la Terreur)'},
+  {n:45, t:'Le Manoir des Pièges'},
+  {n:46, t:'Creature of Havoc (La Créature du Chaos)'},
+  {n:47, t:'L\'Abbaye des Spectres'},
+  {n:48, t:'Stealer of Souls (Le Voleur d\'Âmes — rééd.)'},
+  {n:49, t:'La Pyramide de l\'Horreur'},
+  {n:50, t:'Le Retour du Sorcier'},
+  {n:51, t:'Les Guerriers du Destin'},
+  {n:52, t:'Les Catacombes du Cauchemar'},
+  {n:53, t:'La Grotte du Chaos'},
+  {n:54, t:'La Tour de Glace'},
+  {n:55, t:'Deathmoor (La Lande de la Mort)'},
+  {n:56, t:'Knights of Doom (Les Chevaliers du Destin)'},
+  {n:57, t:'Magehunter (Le Chasseur de Mages)'},
+  {n:58, t:'Revenge of the Vampire (Le Retour du Vampire)'},
+  {n:59, t:'Curse of the Mummy (La Malédiction de la Momie — rééd.)'},
+];
+
+let selectedBookIdx = -1;
+
+function renderBookList(filter=''){
+  const list=document.getElementById('book-list');
+  list.innerHTML='';
+  const q=filter.toLowerCase();
+  const filtered=BOOKS.filter(b=>
+    b.t.toLowerCase().includes(q) ||
+    String(b.n).includes(q)
+  );
+  if(filtered.length===0){
+    list.innerHTML='<div style="padding:12px;text-align:center;font-size:13px;color:var(--ink-light);font-style:italic;">Aucun résultat</div>';
+    return;
+  }
+  filtered.forEach(b=>{
+    const div=document.createElement('div');
+    div.className='book-item'+(selectedBookIdx===b.n?' selected':'');
+    div.innerHTML=`<span class="book-num">${b.n}</span><span class="book-title">${b.t}</span>`;
+    div.onclick=()=>{
+      selectedBookIdx=b.n;
+      document.getElementById('wiz-book').value=`#${b.n} — ${b.t}`;
+      renderBookList(document.getElementById('book-search').value);
+    };
+    list.appendChild(div);
+  });
+}
+
+function filterBooks(q){ renderBookList(q); }
+
+// Init book list when wizard opens
+function initWizardUI(){
+  renderBookList();
+  generateName();
+}
 
 init();
 </script>
