@@ -210,6 +210,23 @@
   .book-title{font-family:'EB Garamond',serif;font-size:14px;color:var(--ink);line-height:1.3;}
   .book-sub{font-size:11px;color:var(--ink-light);}
 
+  /* ── SAVE SYSTEM ── */
+  .save-slot{border:1.5px solid rgba(201,168,76,.3);border-radius:4px;padding:12px 14px;margin-bottom:10px;background:rgba(26,15,0,.04);transition:border-color .2s;}
+  .save-slot.occupied{border-color:rgba(201,168,76,.5);background:rgba(201,168,76,.06);}
+  .save-slot-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .save-slot-num{font-family:'Cinzel Decorative',cursive;font-size:16px;color:var(--gold-dark);width:24px;flex-shrink:0;}
+  .save-slot-name{font-family:'Cinzel',serif;font-size:12px;color:var(--ink);flex:1;letter-spacing:.5px;}
+  .save-slot-date{font-size:11px;color:var(--ink-light);opacity:.7;}
+  .save-slot-meta{font-size:12px;color:var(--ink-light);margin-bottom:10px;line-height:1.6;font-style:italic;}
+  .save-slot-empty{font-size:13px;color:var(--ink-light);font-style:italic;margin-bottom:10px;}
+  .save-slot-btns{display:flex;gap:8px;}
+  .slot-btn{flex:1;padding:8px 6px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;border:1.5px solid;}
+  .slot-btn-save{background:linear-gradient(180deg,#2d5a1a,#1a3a0e);border-color:#5aab3a;color:var(--parchment);}
+  .slot-btn-load{background:linear-gradient(180deg,#2d1500,#1a0a00);border-color:var(--gold-dark);color:var(--gold-light);}
+  .slot-btn-del{background:rgba(139,26,26,.08);border-color:rgba(139,26,26,.3);color:var(--blood-dark);}
+  .slot-btn:active{transform:scale(.95);}
+  .slot-btn:disabled{opacity:.3;pointer-events:none;}
+
   /* ── COMBAT MODIFIERS ── */
   .mod-section{background:rgba(26,15,0,.05);border:1px solid rgba(201,168,76,.25);border-radius:4px;padding:12px 14px;margin-bottom:12px;}
   .mod-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
@@ -493,6 +510,7 @@
     <div class="nav-tab" onclick="showPanel('combat')"><span class="tab-icon">⚔️</span>Combat</div>
     <div class="nav-tab" onclick="showPanel('inventory')"><span class="tab-icon">🎒</span>Sac</div>
     <div class="nav-tab" onclick="showPanel('notes')"><span class="tab-icon">📜</span>Notes</div>
+    <div class="nav-tab" onclick="showPanel('saves')"><span class="tab-icon">💾</span>Saves</div>
   </div>
 
   <div class="content">
@@ -748,6 +766,61 @@
       </div>
     </div>
 
+    <!-- SAVES -->
+    <div class="panel" id="panel-saves">
+
+      <!-- Export / Import -->
+      <div class="card">
+        <div class="card-header"><span class="icon">📤</span> Export / Import</div>
+        <div class="card-body">
+          <div style="font-size:13px;color:var(--ink-light);line-height:1.7;margin-bottom:14px;">
+            Exportez votre partie en fichier <strong>.json</strong> sur votre appareil — elle survivra aux mises à jour, aux changements de navigateur, et peut être partagée. Réimportez-la à tout moment.
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="roll-btn primary" onclick="exportSave()" style="flex:1;min-width:120px;">
+              📤 Exporter (.json)
+            </button>
+            <button class="roll-btn" onclick="document.getElementById('import-file').click()" style="flex:1;min-width:120px;">
+              📥 Importer
+            </button>
+          </div>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="importSave(this)">
+          <div id="import-status" style="margin-top:10px;font-size:13px;text-align:center;color:var(--emerald);display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Slots -->
+      <div class="card">
+        <div class="card-header"><span class="icon">🗄</span> Emplacements de Sauvegarde</div>
+        <div class="card-body">
+          <div style="font-size:13px;color:var(--ink-light);line-height:1.7;margin-bottom:14px;">
+            3 emplacements rapides dans le navigateur. Utilisez l'export pour une sauvegarde permanente.
+          </div>
+          <div id="save-slots"></div>
+        </div>
+      </div>
+
+      <!-- Récupération ancienne sauvegarde -->
+      <div class="card" id="legacy-card" style="display:none;">
+        <div class="card-header"><span class="icon">🔄</span> Ancienne Sauvegarde Détectée</div>
+        <div class="card-body">
+          <div style="font-size:13px;color:var(--ink-light);line-height:1.7;margin-bottom:12px;" id="legacy-desc"></div>
+          <button class="roll-btn primary" onclick="recoverLegacy()" style="width:100%;">
+            🔄 Récupérer cette sauvegarde
+          </button>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="card">
+        <div class="card-header" style="background:linear-gradient(90deg,rgba(139,26,26,.7),rgba(92,14,14,.7));"><span class="icon">⚠️</span> Zone Danger</div>
+        <div class="card-body">
+          <button class="roll-btn" onclick="reopenWizard()" style="width:100%;margin-bottom:8px;">✦ Nouveau personnage (efface la partie)</button>
+        </div>
+      </div>
+
+    </div>
+
   </div>
 </div>
 
@@ -808,32 +881,201 @@ let wiz = {
 };
 const TOTAL_STEPS = 7;
 
+// ══ SAVE SYSTEM ══
+const SAVE_KEY   = 'df-current';      // clé stable, ne change plus jamais
+const SLOT_KEY   = 'df-slot-';        // df-slot-0, df-slot-1, df-slot-2
+const LEGACY_KEYS = ['defi-fantastique-v1','defi-fantastique-v2'];
+
 function init() {
-  const saved = localStorage.getItem('defi-fantastique-v2');
-  if (saved) {
-    try {
-      const parsed = JSON.parse(saved);
-      state = parsed;
-      // If we have a saved character, skip wizard
-      if (state.name) {
-        document.getElementById('wizard').style.display = 'none';
-        render();
-        return;
+  // 1. Cherche la sauvegarde courante (clé stable)
+  let loaded = tryLoad(SAVE_KEY);
+
+  // 2. Si rien, tente les anciennes clés (migration)
+  if (!loaded) {
+    for (const k of LEGACY_KEYS) {
+      loaded = tryLoad(k);
+      if (loaded) {
+        // Migre vers la nouvelle clé
+        localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+        localStorage.removeItem(k);
+        toast('🔄 Ancienne sauvegarde récupérée !');
+        break;
       }
-    } catch(e) {}
+    }
   }
-  // Show wizard
+
+  if (loaded && state.name) {
+    document.getElementById('wizard').style.display = 'none';
+    render();
+    checkLegacySlots();
+    return;
+  }
+
+  // 3. Aucune sauvegarde — wizard
+  checkLegacySlots();
   wizGo(0);
   initWizardUI();
 }
 
+function tryLoad(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return false;
+    state = parsed;
+    return true;
+  } catch(e) { return false; }
+}
+
+// Vérifie si une sauvegarde legacy traîne encore dans un slot ou une clé oubliée
+function checkLegacySlots() {
+  for (const k of LEGACY_KEYS) {
+    const raw = localStorage.getItem(k);
+    if (raw) {
+      try {
+        const p = JSON.parse(raw);
+        if (p && p.name) {
+          const card = document.getElementById('legacy-card');
+          document.getElementById('legacy-desc').innerHTML =
+            `Une sauvegarde de <strong>${p.name}</strong> (ancienne version) a été trouvée. Vous pouvez la récupérer.`;
+          card.style.display = 'block';
+          card._legacyKey = k;
+          return;
+        }
+      } catch(e) {}
+    }
+  }
+}
+
+function recoverLegacy() {
+  const card = document.getElementById('legacy-card');
+  const k = card._legacyKey;
+  if (!k) return;
+  const raw = localStorage.getItem(k);
+  if (!raw) return;
+  try {
+    state = JSON.parse(raw);
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    localStorage.removeItem(k);
+    card.style.display = 'none';
+    document.getElementById('wizard').style.display = 'none';
+    render();
+    toast('✅ Sauvegarde récupérée : '+state.name+' !');
+  } catch(e) { toast('❌ Erreur lors de la récupération.'); }
+}
+
 function save() {
-  state.name = document.getElementById('char-name').value;
-  state.book = document.getElementById('char-book').value;
+  state.name  = document.getElementById('char-name').value;
+  state.book  = document.getElementById('char-book').value;
   state.notes = document.getElementById('notes-area').value;
   state.paras = document.getElementById('para-area').value;
-  localStorage.setItem('defi-fantastique-v2', JSON.stringify(state));
+  state._savedAt = Date.now();
+  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   updateHeader();
+}
+
+// ── Slots ──
+function renderSlots() {
+  const container = document.getElementById('save-slots');
+  container.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const raw = localStorage.getItem(SLOT_KEY + i);
+    let slot = null;
+    try { slot = raw ? JSON.parse(raw) : null; } catch(e) {}
+    const div = document.createElement('div');
+    div.className = 'save-slot' + (slot ? ' occupied' : '');
+    const date = slot?._savedAt ? new Date(slot._savedAt).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    div.innerHTML = `
+      <div class="save-slot-header">
+        <span class="save-slot-num">${i+1}</span>
+        <span class="save-slot-name">${slot ? esc(slot.name||'Sans nom') : 'Emplacement vide'}</span>
+        ${date ? `<span class="save-slot-date">${date}</span>` : ''}
+      </div>
+      ${slot ? `<div class="save-slot-meta">
+        ${esc(slot.book||'')} · Hab ${slot.skillMax} · End ${slot.staminaMax} · Cha ${slot.luckMax}
+      </div>` : `<div class="save-slot-empty">Aucune partie sauvegardée</div>`}
+      <div class="save-slot-btns">
+        <button class="slot-btn slot-btn-save" onclick="saveToSlot(${i})">💾 Sauvegarder</button>
+        <button class="slot-btn slot-btn-load" onclick="loadFromSlot(${i})" ${!slot?'disabled':''}>📂 Charger</button>
+        <button class="slot-btn slot-btn-del"  onclick="deleteSlot(${i})"   ${!slot?'disabled':''}>🗑 Effacer</button>
+      </div>`;
+    container.appendChild(div);
+  }
+}
+
+function saveToSlot(i) {
+  const snap = JSON.parse(JSON.stringify(state));
+  snap._savedAt = Date.now();
+  snap.name  = document.getElementById('char-name').value || state.name;
+  snap.notes = document.getElementById('notes-area').value || state.notes;
+  snap.paras = document.getElementById('para-area').value  || state.paras;
+  localStorage.setItem(SLOT_KEY + i, JSON.stringify(snap));
+  renderSlots();
+  toast('💾 Sauvegardé dans l\'emplacement '+(i+1)+' !');
+}
+
+function loadFromSlot(i) {
+  if (!confirm('Charger l\'emplacement '+(i+1)+' ? La partie en cours sera écrasée.')) return;
+  const raw = localStorage.getItem(SLOT_KEY + i);
+  if (!raw) return;
+  try {
+    state = JSON.parse(raw);
+    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    render();
+    toast('📂 Emplacement '+(i+1)+' chargé !');
+  } catch(e) { toast('❌ Erreur de chargement.'); }
+}
+
+function deleteSlot(i) {
+  if (!confirm('Effacer l\'emplacement '+(i+1)+' définitivement ?')) return;
+  localStorage.removeItem(SLOT_KEY + i);
+  renderSlots();
+  toast('🗑 Emplacement '+(i+1)+' effacé.');
+}
+
+// ── Export / Import ──
+function exportSave() {
+  const snap = JSON.parse(JSON.stringify(state));
+  snap.name  = document.getElementById('char-name').value || state.name;
+  snap.notes = document.getElementById('notes-area').value || state.notes;
+  snap.paras = document.getElementById('para-area').value  || state.paras;
+  snap._exportedAt = new Date().toISOString();
+  snap._version = 3;
+  const blob = new Blob([JSON.stringify(snap, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const hero = (snap.name || 'hero').replace(/[^a-z0-9]/gi,'_').toLowerCase();
+  a.href = url;
+  a.download = `defi-fantastique_${hero}_${new Date().toLocaleDateString('fr-FR').replace(/\//g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('📤 Sauvegarde exportée !');
+}
+
+function importSave(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (!parsed.name || !parsed.skill) throw new Error('Format invalide');
+      state = parsed;
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+      document.getElementById('wizard').style.display = 'none';
+      render();
+      const status = document.getElementById('import-status');
+      status.textContent = '✅ Importé : '+state.name;
+      status.style.display = 'block';
+      setTimeout(()=>status.style.display='none', 3000);
+      toast('📥 Partie importée : '+state.name+' !');
+    } catch(err) {
+      toast('❌ Fichier invalide ou corrompu.');
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
 }
 
 function updateHeader() {
@@ -1112,7 +1354,7 @@ function wizFinish() {
     notes: '', paras: '',
     diceHistory: []
   };
-  localStorage.setItem('defi-fantastique-v2', JSON.stringify(state));
+  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   document.getElementById('wizard').style.display='none';
   render();
   toast('⚔️ Que l\'aventure commence, '+state.name+' !');
@@ -1280,8 +1522,9 @@ function showPanel(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
-  const tabs=['stats','dice','combat','inventory','notes'];
+  const tabs=['stats','dice','combat','inventory','notes','saves'];
   document.querySelectorAll('.nav-tab')[tabs.indexOf(id)].classList.add('active');
+  if(id==='saves') renderSlots();
 }
 
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800);}
