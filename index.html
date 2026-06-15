@@ -94,12 +94,13 @@
   @keyframes shake{0%,100%{transform:rotate(0) scale(1)}20%{transform:rotate(-12deg) scale(1.1)}40%{transform:rotate(10deg) scale(1.1)}60%{transform:rotate(-8deg) scale(1.05)}80%{transform:rotate(6deg) scale(1.05)}}
 
   /* ── MAIN APP ── */
-  .header{background:linear-gradient(180deg,#1a0a00 0%,#2d1500 60%,#1a0a00 100%);border-bottom:3px solid var(--gold);padding:18px 16px 14px;text-align:center;position:relative;overflow:hidden;}
-  .header::before{content:'⚔';position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:22px;opacity:.6;color:var(--gold);}
-  .header::after{content:'⚔';position:absolute;right:16px;top:50%;transform:translateY(-50%) scaleX(-1);font-size:22px;opacity:.6;color:var(--gold);}
-  .header-title{font-family:'Cinzel Decorative',cursive;font-size:13px;color:var(--gold-light);letter-spacing:3px;text-transform:uppercase;line-height:1;margin-bottom:4px;}
-  .header-sub{font-family:'Cinzel',serif;font-size:10px;color:var(--parchment-dark);letter-spacing:2px;opacity:.7;}
-  .header-name{font-family:'Cinzel',serif;font-size:13px;color:var(--gold);margin-top:5px;letter-spacing:1px;}
+  .header{background:linear-gradient(180deg,#1a0a00 0%,#2d1500 60%,#1a0a00 100%);border-bottom:3px solid var(--gold);padding:10px 12px;display:flex;align-items:center;gap:8px;}
+  .header-sword{font-size:16px;opacity:.5;color:var(--gold);flex-shrink:0;line-height:1;}
+  .header-sword.flip{display:inline-block;transform:scaleX(-1);}
+  .header-center{flex:1;text-align:center;min-width:0;overflow:hidden;}
+  .header-title{font-family:'Cinzel Decorative',cursive;font-size:11px;color:var(--gold-light);letter-spacing:2px;text-transform:uppercase;line-height:1;margin-bottom:3px;}
+  .header-sub{font-family:'Cinzel',serif;font-size:9px;color:var(--parchment-dark);letter-spacing:1px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .header-name{font-family:'Cinzel',serif;font-size:11px;color:var(--gold);margin-top:3px;letter-spacing:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   .nav{display:flex;background:#120800;border-bottom:2px solid var(--gold-dark);}
   .nav-tab{flex:1;padding:10px 4px;text-align:center;cursor:pointer;font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--parchment-dark);text-transform:uppercase;border-right:1px solid rgba(201,168,76,.2);transition:all .2s;-webkit-tap-highlight-color:transparent;}
@@ -502,13 +503,14 @@
 
   <!-- ══════════════ MAIN APP ══════════════ -->
   <div class="header">
-    <span class="header-swords">⚔</span>
+    <span class="header-sword">⚔</span>
     <div class="header-center">
       <div class="header-title">Défi Fantastique</div>
       <div class="header-sub" id="header-book-sub">Fiche de Personnage</div>
       <div class="header-name" id="header-hero-name"></div>
     </div>
-    <button class="wiz-reopen-btn" onclick="reopenWizard()" title="Recréer un personnage">✦ Nouveau</button>
+    <button class="wiz-reopen-btn" onclick="reopenWizard()">✦ Nouveau</button>
+    <span class="header-sword flip">⚔</span>
   </div>
 
   <div class="nav">
