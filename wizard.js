@@ -222,24 +222,52 @@ function wizFinish() {
 // ── Réinitialisation du wizard ───────────
 function reopenWizard() {
   if (!confirm('Créer un nouveau personnage ? La partie actuelle sera effacée.')) return;
+
   localStorage.removeItem(SAVE_KEY);
 
-  wiz = { step: 0, name: '', book: '', skill: null, skillRolled: false, stamina: null, staminaRolled: false, luck: null, luckRolled: false, gold: 0, potion: 'stamina' };
-  wizExtraItems  = [];
+  // Reset état wizard
+  wiz = {
+    step: 0, name: '', book: '',
+    skill: null,   skillRolled: false,
+    stamina: null, staminaRolled: false,
+    luck: null,    luckRolled: false,
+    gold: 0, potion: 'stamina',
+  };
+  wizExtraItems   = [];
   selectedBookIdx = -1;
 
-  // Reset UI wizard
-  ['wiz-skill-roll','wiz-stamina-roll','wiz-luck-roll'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '–'; });
-  ['wiz-d-skill','wiz-d-stamina1','wiz-d-stamina2','wiz-d-luck'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '?'; });
-  ['wiz-skill-reroll-hint','wiz-stamina-reroll-hint','wiz-luck-reroll-hint'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
-  document.getElementById('wiz-name').value  = '';
-  document.getElementById('wiz-book').value  = '';
-  document.getElementById('book-search').value = '';
-  document.getElementById('name-suggestions').innerHTML = '';
-  document.getElementById('wiz-gold-display').textContent = '0';
-  document.querySelectorAll('#potion-choices .equip-opt').forEach((o, i) => o.classList.toggle('selected', i === 0));
+  // Reset champs de dés
+  const safeText = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  const safeVal  = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+  const safeHide = (id)      => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+
+  safeText('wiz-skill-roll',   '–');
+  safeText('wiz-stamina-roll', '–');
+  safeText('wiz-luck-roll',    '–');
+  safeText('wiz-d-skill',      '?');
+  safeText('wiz-d-stamina1',   '?');
+  safeText('wiz-d-stamina2',   '?');
+  safeText('wiz-d-luck',       '?');
+  safeText('wiz-gold-display',  '0');
+
+  safeHide('wiz-skill-reroll-hint');
+  safeHide('wiz-stamina-reroll-hint');
+  safeHide('wiz-luck-reroll-hint');
+
+  safeVal('wiz-name',    '');
+  safeVal('wiz-book',    '');
+  safeVal('book-search', '');
+
+  const nameSug = document.getElementById('name-suggestions');
+  if (nameSug) nameSug.innerHTML = '';
+
+  // Reset sélection potion (premier choix par défaut)
+  document.querySelectorAll('#potion-choices .equip-opt')
+    .forEach((o, i) => o.classList.toggle('selected', i === 0));
+
   renderWizExtraList();
 
+  // Afficher le wizard et aller à l'étape 0
   document.getElementById('wizard').style.display = 'flex';
   wizGo(0);
   initWizardUI();
