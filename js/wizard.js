@@ -8,7 +8,8 @@ const WIZ_TOTAL_STEPS = 7;
 // État du wizard
 let wiz = {
   step: 0,
-  name: '', book: '',
+  name: '', book: '', bookNum: null,
+  theme: 'fantasy',
   skill: null,   skillRolled: false,
   stamina: null, staminaRolled: false,
   luck: null,    luckRolled: false,
@@ -16,8 +17,58 @@ let wiz = {
   potion: 'stamina',
 };
 
-let wizExtraItems = [];
+let wizExtraItems   = [];
 let selectedBookIdx = -1;
+
+// ── Thème courant ─────────────────────────
+function currentTheme() {
+  return THEMES[wiz.theme] || THEMES.fantasy;
+}
+
+// ── Appliquer le thème au wizard ──────────
+function applyTheme(themeKey) {
+  wiz.theme = themeKey || 'fantasy';
+  const theme = currentTheme();
+
+  // Couleur d'accent du wizard
+  document.documentElement.style.setProperty('--wiz-accent', theme.color);
+
+  // Mettre à jour la bannière de thème
+  const banner = document.getElementById('wiz-theme-banner');
+  if (banner) {
+    banner.innerHTML = `<span style="font-size:20px">${theme.icon}</span> <span>${theme.label}</span>`;
+    banner.style.display = 'flex';
+    banner.style.borderColor = theme.color;
+  }
+
+  // Afficher l'alerte règles spéciales
+  const special = document.getElementById('wiz-special-rules');
+  if (special) {
+    if (theme.special) {
+      special.textContent = '⚠️ ' + theme.special;
+      special.style.display = 'block';
+    } else {
+      special.style.display = 'none';
+    }
+  }
+
+  // Pré-remplir l'équipement avec celui du thème
+  wizExtraItems = [];
+  renderWizExtraList();
+  const hint = document.getElementById('wiz-equip-hint');
+  if (hint) hint.textContent = theme.hint;
+}
+
+// ── Sélection du livre (step 1) ──────────
+function onBookSelected(bookNum, bookTitle) {
+  wiz.bookNum = bookNum;
+  wiz.book    = bookTitle;
+  document.getElementById('wiz-book').value = bookTitle;
+
+  const themeKey = BOOK_THEMES[bookNum] || 'fantasy';
+  applyTheme(themeKey);
+}
+
 
 // ── Navigation ───────────────────────────
 function wizGo(step) {
@@ -174,9 +225,11 @@ function selectPotion(el) {
 
 // ── Résumé ───────────────────────────────
 function buildSummary() {
-  const pt       = POTION_TYPES[wiz.potion || 'stamina'];
-  const baseItems = ['Épée', 'Armure de cuir', 'Lanterne'];
+  const pt        = POTION_TYPES[wiz.potion || 'stamina'];
+  const theme     = currentTheme();
+  const baseItems = theme.equipment || ['Épée', 'Armure de cuir', 'Lanterne'];
   const allItems  = [...baseItems, ...wizExtraItems];
+  const sumTheme  = document.getElementById('sum-theme');
 
   document.getElementById('sum-skill').textContent   = wiz.skill;
   document.getElementById('sum-stamina').textContent = wiz.stamina;
@@ -186,21 +239,21 @@ function buildSummary() {
   document.getElementById('sum-equip').textContent   = allItems.join(', ');
   document.getElementById('sum-gold').textContent    = (wiz.gold || 0) + ' PO';
   document.getElementById('sum-potion').textContent  = pt.icon + ' ' + pt.label + ' (2 mesures)';
+  if (sumTheme) sumTheme.textContent = theme.icon + ' ' + theme.label;
 }
 
 // ── Finalisation ─────────────────────────
 function wizFinish() {
   const pt        = POTION_TYPES[wiz.potion || 'stamina'];
-  const baseItems = [
-    { name: 'Épée',           qty: 1 },
-    { name: 'Armure de cuir', qty: 1 },
-    { name: 'Lanterne',       qty: 1 },
-    { name: pt.label + ' (2 mesures)', qty: 1 },
-  ];
+  const theme     = currentTheme();
+  const baseItems = (theme.equipment || ['Épée', 'Armure de cuir', 'Lanterne'])
+    .map(name => ({ name, qty: 1 }));
+  baseItems.push({ name: pt.label + ' (2 mesures)', qty: 1 });
   wizExtraItems.forEach(n => baseItems.push({ name: n, qty: 1 }));
 
   state = {
     name: wiz.name, book: wiz.book,
+    theme: wiz.theme,
     skill:   wiz.skill,   skillMax:   wiz.skill,
     stamina: wiz.stamina, staminaMax: wiz.stamina,
     luck:    wiz.luck,    luckMax:    wiz.luck,
@@ -216,7 +269,8 @@ function wizFinish() {
   localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   document.getElementById('wizard').style.display = 'none';
   render();
-  toast('⚔️ Que l\'aventure commence, ' + state.name + ' !');
+  const themeIcon = theme.icon || '⚔️';
+  toast(themeIcon + ' Que l\'aventure commence, ' + state.name + ' !');
 }
 
 // ── Réinitialisation du wizard ───────────
@@ -227,7 +281,8 @@ function reopenWizard() {
 
   // Reset état wizard
   wiz = {
-    step: 0, name: '', book: '',
+    step: 0, name: '', book: '', bookNum: null,
+    theme: 'fantasy',
     skill: null,   skillRolled: false,
     stamina: null, staminaRolled: false,
     luck: null,    luckRolled: false,
@@ -273,21 +328,40 @@ function reopenWizard() {
   initWizardUI();
 }
 
-// ── Générateur de noms ───────────────────
+// ── Générateur de noms (adapté au thème) ─
 function generateName() {
-  const rnd  = arr => arr[Math.floor(Math.random() * arr.length)];
+  const theme  = currentTheme();
+  const style  = NAMES_BY_STYLE[theme.nameStyle] || NAMES_BY_STYLE.fantasy;
+  const rnd    = arr => arr[Math.floor(Math.random() * arr.length)];
   const suggestions = [];
 
-  for (let i = 0; i < 3; i++)
-    suggestions.push(rnd(NAME_PARTS.prefix) + rnd(NAME_PARTS.suffix));
-
-  suggestions.push(rnd(NAME_PARTS.female) + ' ' + rnd(NAME_PARTS.titles));
-  suggestions.push(rnd(NAME_PARTS.male)   + ' ' + rnd(NAME_PARTS.titles));
-  suggestions.push(rnd(NAME_PARTS.prefix) + rnd(NAME_PARTS.mid));
+  if (theme.nameStyle === 'fantasy') {
+    for (let i = 0; i < 3; i++)
+      suggestions.push(rnd(style.prefix) + rnd(style.suffix));
+    suggestions.push(rnd(style.female) + ' ' + rnd(style.titles));
+    suggestions.push(rnd(style.male)   + ' ' + rnd(style.titles));
+    suggestions.push(rnd(style.prefix) + rnd(style.mid));
+  } else if (theme.nameStyle === 'superhero') {
+    for (let i = 0; i < 3; i++)
+      suggestions.push(rnd(style.heroNames));
+    suggestions.push(rnd(style.male)   + ' ' + rnd(style.titles));
+    suggestions.push(rnd(style.female) + ' ' + rnd(style.titles));
+    suggestions.push(rnd(style.heroNames));
+  } else {
+    // modern, japanese, ancient
+    for (let i = 0; i < 3; i++)
+      suggestions.push(rnd(style.male)   + ' ' + rnd(style.titles));
+    for (let i = 0; i < 3; i++)
+      suggestions.push(rnd(style.female) + ' ' + rnd(style.titles));
+  }
 
   const container = document.getElementById('name-suggestions');
+  if (!container) return;
   container.innerHTML = '';
-  suggestions.forEach(name => {
+  const labelEl = document.getElementById('wiz-name-style-label');
+  if (labelEl) labelEl.textContent = `Style : ${theme.label} ${theme.icon}`;
+
+  suggestions.slice(0, 6).forEach(name => {
     const chip = document.createElement('div');
     chip.className   = 'name-chip';
     chip.textContent = name;
@@ -300,7 +374,7 @@ function generateName() {
   });
 }
 
-// ── Liste des livres ─────────────────────
+// ── Liste des livres (avec icône de thème) ─
 function renderBookList(filter = '') {
   const list = document.getElementById('book-list');
   if (!list) return;
@@ -313,12 +387,18 @@ function renderBookList(filter = '') {
   }
   list.innerHTML = '';
   filtered.forEach(b => {
-    const div = document.createElement('div');
-    div.className = 'book-item' + (selectedBookIdx === b.n ? ' selected' : '');
-    div.innerHTML = `<span class="book-num">${b.n}</span><span class="book-title">${b.t}</span>`;
-    div.onclick   = () => {
+    const themeKey = BOOK_THEMES[b.n] || 'fantasy';
+    const theme    = THEMES[themeKey];
+    const div      = document.createElement('div');
+    div.className  = 'book-item' + (selectedBookIdx === b.n ? ' selected' : '');
+    div.innerHTML  = `
+      <span class="book-num">${b.n}</span>
+      <span style="font-size:14px;flex-shrink:0;" title="${theme.label}">${theme.icon}</span>
+      <span class="book-title">${b.t}</span>`;
+    div.onclick = () => {
       selectedBookIdx = b.n;
-      document.getElementById('wiz-book').value = `#${b.n} — ${b.t}`;
+      const fullTitle = `#${b.n} — ${b.t}`;
+      onBookSelected(b.n, fullTitle);
       renderBookList(document.getElementById('book-search').value);
     };
     list.appendChild(div);
@@ -329,6 +409,7 @@ function filterBooks(q) { renderBookList(q); }
 
 // ── Init UI du wizard ────────────────────
 function initWizardUI() {
+  applyTheme(wiz.theme || 'fantasy');
   renderBookList();
   generateName();
 }
