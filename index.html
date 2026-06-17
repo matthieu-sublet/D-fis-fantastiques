@@ -55,19 +55,14 @@
           <div class="wiz-intro">
             <div class="wiz-intro-icon">📖</div>
             <h2>Votre Identité</h2>
-            <p>Choisissez le nom de votre héros et le livre que vous allez affronter.</p>
+            <p>Choisissez d'abord le livre — le wizard s'adaptera automatiquement à son univers.</p>
           </div>
 
-          <div style="margin-bottom:6px;">
-            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px;">Nom du héros</div>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <input class="name-input" id="wiz-name" type="text" placeholder="Nom du personnage…" maxlength="30" style="margin:0;flex:1;">
-              <button class="btn-gen-name" onclick="generateName()" title="Générer un nom aléatoire">🎲</button>
-            </div>
-            <div class="name-gen-chips" id="name-suggestions"></div>
-          </div>
+          <!-- Bannière thème détecté -->
+          <div id="wiz-theme-banner" style="display:none;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--gold-dark);border-radius:4px;background:rgba(26,15,0,.06);margin-bottom:12px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;color:var(--ink);text-transform:uppercase;"></div>
+          <div id="wiz-special-rules" style="display:none;padding:10px 14px;border-radius:4px;background:rgba(139,26,26,.07);border:1px solid rgba(139,26,26,.25);font-size:13px;color:var(--blood-dark);line-height:1.6;margin-bottom:12px;"></div>
 
-          <div style="margin-top:16px;">
+          <div style="margin-top:4px;">
             <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px;">Livre Défi Fantastique</div>
             <div class="book-search-wrap">
               <input class="book-search-input" id="book-search" type="text" placeholder="🔍 Rechercher un titre ou numéro…" oninput="filterBooks(this.value)">
@@ -77,6 +72,16 @@
               <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-light);margin-bottom:4px;">Ou saisir manuellement</div>
               <input class="name-input book-input" id="wiz-book" type="text" placeholder="Titre personnalisé…" maxlength="80" style="margin:0;">
             </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-light);margin-bottom:6px;">Nom du héros</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input class="name-input" id="wiz-name" type="text" placeholder="Nom du personnage…" maxlength="30" style="margin:0;flex:1;">
+              <button class="btn-gen-name" onclick="generateName()" title="Générer un nom adapté à l'univers">🎲</button>
+            </div>
+            <div id="wiz-name-style-label" style="font-size:11px;color:var(--ink-light);margin:6px 0 4px;font-style:italic;"></div>
+            <div class="name-gen-chips" id="name-suggestions"></div>
           </div>
         </div>
 
@@ -156,11 +161,7 @@
 
           <div style="background:rgba(26,15,0,.06);border:1px solid rgba(201,168,76,.3);border-radius:4px;padding:12px 14px;margin-bottom:14px;">
             <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:10px;">📦 Équipement standard</div>
-            <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink);">
-              <div>⚔️ &nbsp;Une épée</div>
-              <div>🛡 &nbsp;Une armure de cuir</div>
-              <div>🕯 &nbsp;Une lanterne</div>
-            </div>
+            <div id="wiz-equip-hint" style="font-size:13px;color:var(--ink-light);line-height:1.7;">Univers classique de Titan — épées, magie et donjons.</div>
           </div>
 
           <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:8px;">➕ Ajouter un objet</div>
@@ -219,6 +220,7 @@
           </div>
           <table class="summary-table">
             <tr><td>Nom</td><td id="sum-name">–</td></tr>
+            <tr><td>Univers</td><td id="sum-theme">–</td></tr>
             <tr><td>Livre</td><td id="sum-book">–</td></tr>
             <tr><td>Équipement</td><td id="sum-equip">–</td></tr>
             <tr><td>Or</td><td id="sum-gold">–</td></tr>
