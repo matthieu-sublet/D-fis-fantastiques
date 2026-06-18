@@ -2,6 +2,19 @@
    ui.js — Rendu de l'interface principale
 ══════════════════════════════════════════ */
 
+// ── Ouvrir le PDF du livre courant ───────
+function openCurrentBookPDF() {
+  const bookNum = state.bookNum || (state.book ? parseInt(state.book) : null);
+  if (bookNum) {
+    openBookPDF(bookNum);
+    return;
+  }
+  // Tenter de déduire depuis le titre stocké (#N — Titre)
+  const match = (state.book || '').match(/^#(\d+)/);
+  if (match) { openBookPDF(parseInt(match[1])); return; }
+  toast('❌ Aucun livre associé à ce personnage.');
+}
+
 // ── Toast ────────────────────────────────
 function toast(msg) {
   const el = document.getElementById('toast');

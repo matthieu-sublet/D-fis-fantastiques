@@ -94,7 +94,12 @@ function wizGo(step) {
   if (step > 0) btnBack.style.display = 'block';
 
   if      (step === 0) { btnNext.style.display = 'block'; btnNext.textContent = 'Créer mon héros →'; }
-  else if (step === 1) { btnNext.style.display = 'block'; btnNext.textContent = 'Suivant →'; }
+  else if (step === 1) {
+    btnNext.style.display = 'block';
+    btnNext.textContent = 'Suivant →';
+    // Rendu différé — le DOM est maintenant visible
+    setTimeout(() => { renderBookList(document.getElementById('book-search')?.value || ''); generateName(); }, 0);
+  }
   else if (step === 2) _wizStatButtons('skill',   'skill',   '1d6+6');
   else if (step === 3) _wizStatButtons('stamina', 'stamina', '2d6+12');
   else if (step === 4) _wizStatButtons('luck',    'luck',    '1d6+6');
@@ -126,7 +131,11 @@ function wizNext() {
   const step = wiz.step;
   if (step === 1) {
     const nm = document.getElementById('wiz-name').value.trim();
-    if (!nm) { toast('⚠ Entrez un nom pour votre héros !'); return; }
+    if (!nm) {
+      toast('⚠ Entrez un nom pour votre héros !');
+      document.getElementById('wiz-name').focus();
+      return;
+    }
     wiz.name = nm;
     wiz.book = document.getElementById('wiz-book').value.trim() || 'Livre sans titre';
   }
@@ -253,6 +262,7 @@ function wizFinish() {
 
   state = {
     name: wiz.name, book: wiz.book,
+    bookNum: wiz.bookNum || null,
     theme: wiz.theme,
     skill:   wiz.skill,   skillMax:   wiz.skill,
     stamina: wiz.stamina, staminaMax: wiz.stamina,
@@ -374,7 +384,14 @@ function generateName() {
   });
 }
 
-// ── Liste des livres (avec icône de thème) ─
+// ── Ouvrir le PDF d'un livre ─────────────
+function openBookPDF(n) {
+  const book = BOOKS.find(b => b.n === n);
+  if (!book || !book.pdf) { toast('❌ PDF non disponible pour ce livre.'); return; }
+  window.open(BASE_PDF + book.pdf, '_blank');
+}
+
+// ── Liste des livres (avec icône de thème et bouton PDF) ─
 function renderBookList(filter = '') {
   const list = document.getElementById('book-list');
   if (!list) return;
@@ -393,8 +410,9 @@ function renderBookList(filter = '') {
     div.className  = 'book-item' + (selectedBookIdx === b.n ? ' selected' : '');
     div.innerHTML  = `
       <span class="book-num">${b.n}</span>
-      <span style="font-size:14px;flex-shrink:0;" title="${theme.label}">${theme.icon}</span>
-      <span class="book-title">${b.t}</span>`;
+      <span style="font-size:13px;flex-shrink:0;" title="${theme.label}">${theme.icon}</span>
+      <span class="book-title" style="flex:1;">${b.t}</span>
+      <button class="book-pdf-btn" onclick="event.stopPropagation(); openBookPDF(${b.n})" title="Lire le PDF">📖</button>`;
     div.onclick = () => {
       selectedBookIdx = b.n;
       const fullTitle = `#${b.n} — ${b.t}`;
@@ -410,6 +428,5 @@ function filterBooks(q) { renderBookList(q); }
 // ── Init UI du wizard ────────────────────
 function initWizardUI() {
   applyTheme(wiz.theme || 'fantasy');
-  renderBookList();
-  generateName();
+  // renderBookList et generateName sont appelés dans wizGo(1) quand le DOM est prêt
 }
