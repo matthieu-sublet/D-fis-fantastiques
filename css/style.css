@@ -71,6 +71,12 @@ body::before {
 .header-sub        { font-family: 'Cinzel', serif; font-size: 9px; color: var(--parchment-dark); letter-spacing: 1px; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .header-name       { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); margin-top: 3px; letter-spacing: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wiz-reopen-btn    { flex-shrink: 0; background: rgba(201,168,76,.12); border: 1px solid rgba(201,168,76,.35); color: var(--gold); font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; padding: 6px 8px; border-radius: 3px; cursor: pointer; -webkit-tap-highlight-color: transparent; white-space: nowrap; }
+.header-pdf-btn    { flex-shrink: 0; background: rgba(201,168,76,.08); border: 1px solid rgba(201,168,76,.25); color: var(--gold-light); font-size: 16px; width: 34px; height: 34px; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: all .15s; }
+.header-pdf-btn:active { transform: scale(.92); background: rgba(201,168,76,.2); }
+
+/* ══ BOOK PDF BUTTON ══ */
+.book-pdf-btn { flex-shrink: 0; background: none; border: 1px solid rgba(201,168,76,.3); border-radius: 3px; font-size: 14px; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: all .15s; }
+.book-pdf-btn:active { background: rgba(201,168,76,.15); transform: scale(.92); }
 
 /* ══ NAV ══ */
 .nav { display: flex; background: #120800; border-bottom: 2px solid var(--gold-dark); }
