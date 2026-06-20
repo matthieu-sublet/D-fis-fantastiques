@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════
    data.js — Données statiques
-   Livres, noms, potions
+   Potions, livres, thèmes, noms
 ══════════════════════════════════════════ */
 
 // ── Potions ──────────────────────────────
@@ -10,37 +10,15 @@ const POTION_TYPES = {
   luck:    { label: 'Potion de Bonne Fortune', icon: '🍀', stat: 'luck'    },
 };
 
-// ── Générateur de noms ───────────────────
-const NAME_PARTS = {
-  prefix: ['Ald','Bra','Cal','Dor','Eld','Fal','Gar','Hal','Ith','Jor',
-            'Kel','Lor','Mal','Nor','Orn','Pel','Ran','Sor','Tal','Vor',
-            'Wyn','Zar','Aer','Bel','Cyn','Dar','Even','Fir','Gwen','Hael'],
-  mid:    ['an','ar','en','or','al','in','on','el','ath','iel',
-            'wyn','mir','dan','gar','dor','ven','bar','tor','sel','mar'],
-  suffix: ['dor','mir','wyn','las','rand','iel','ion','ath','ryn','gar',
-            'thor','ven','dal','sur','rath','bor','sel','nar','diel','orn'],
-  titles: ["le Brave","le Téméraire","la Courageuse","l'Intrépide",
-            'la Valkyrie','le Chasseur',"l'Éclaireur",'la Guerrière',
-            'le Sage',"l'Ombre",'le Forgeron','la Chasseresse',
-            'le Pèlerin',"l'Érudit",'la Sentinelle'],
-  female: ['Aelindra','Sylvara','Myrène','Elowen','Ithilwen','Caladria',
-            'Nyriel','Selvaine','Thariel','Rysara','Briavel','Cenara',
-            'Fenwyn','Lyreith','Morwenna'],
-  male:   ['Aldric','Braxton','Caldor','Dorian','Elvaren','Falkor',
-            'Garreth','Halsten','Irvaan','Jorund','Keldar','Lorian',
-            'Malvern','Nordan','Orskel','Pelador','Randor','Sorvan',
-            'Taldris','Vorath'],
-};
-
-// ── Liste des livres Défi Fantastique ────
+// ── Livres avec URL PDF ──────────────────
 const BASE_PDF = 'https://bibl.remz.ca/defis_fantastiques-65/';
 
 const BOOKS = [
   { n:  1, t: 'Le Sorcier de la Montagne de Feu',  pdf: 'Defis%20Fantastiques%2001%20-%20Le%20Sorcier%20de%20la%20Montagne%20de%20feu.pdf' },
   { n:  2, t: 'La Citadelle du Chaos',              pdf: 'Defis%20Fantastiques%2002%20-%20La%20Citadelle%20du%20Chaos.pdf' },
-  { n:  3, t: 'La Forêt de la Malédiction',         pdf: 'Defis%20Fantastiques%2003%20-%20La%20For%C3%AAt%20de%20la%20Mal%C3%A9diction.pdf' },
-  { n:  4, t: 'La Cité des Voleurs',                pdf: 'Defis%20Fantastiques%2004%20-%20La%20Cit%C3%A9%20des%20Voleurs.pdf' },
-  { n:  5, t: 'La Plaine des Ténèbres',             pdf: 'Defis%20Fantastiques%2005%20-%20La%20Plaine%20des%20T%C3%A9n%C3%A8bres.pdf' },
+  { n:  3, t: 'La Forêt de la Malédiction',         pdf: 'Defis%20Fantastiques%2003%20-%20La%20Foret%20de%20la%20Malediction.pdf' },
+  { n:  4, t: 'La Cité des Voleurs',                pdf: 'Defis%20Fantastiques%2004%20-%20La%20Cite%20des%20Voleurs.pdf' },
+  { n:  5, t: 'La Plaine des Ténèbres',             pdf: 'Defis%20Fantastiques%2005%20-%20La%20Plaine%20des%20Tenebres.pdf' },
   { n:  6, t: "Le Manoir de l'Enfer",               pdf: "Defis%20Fantastiques%2006%20-%20Le%20Manoir%20de%20l'enfer.pdf" },
   { n:  7, t: "L'Île du Roi Lézard",                pdf: "Defis%20Fantastiques%2007%20-%20L'Ile%20du%20Roi%20Lezard.pdf" },
   { n:  8, t: 'Les Collines du Diable',             pdf: 'Defis%20Fantastiques%2008%20-%20Les%20Collines%20du%20Diable.pdf' },
@@ -56,7 +34,7 @@ const BOOKS = [
   { n: 18, t: "L'Autel des Dieux",                  pdf: "Defis%20Fantastiques%2018%20-%20L'Autel%20des%20Dieux.pdf" },
   { n: 19, t: 'Le Masque du Chaos',                 pdf: 'Defis%20Fantastiques%2019%20-%20Le%20Masque%20du%20Chaos.pdf' },
   { n: 20, t: 'La Tombe des Rois',                  pdf: 'Defis%20Fantastiques%2020%20-%20La%20Tombe%20des%20Rois.pdf' },
-  { n: 21, t: 'Le Château Mystérieux',              pdf: "Defis%20Fantastiques%2021%20-%20l'epreuve%20des%20champions.pdf" },
+  { n: 21, t: "L'Épreuve des Champions",            pdf: "Defis%20Fantastiques%2021%20-%20l'epreuve%20des%20champions.pdf" },
   { n: 22, t: 'Le Robot de Glace',                  pdf: 'Defis%20Fantastiques%2022%20-%20Le%20Robot%20de%20Glace.pdf' },
   { n: 23, t: "L'Horreur sur Titan",                pdf: "Defis%20Fantastiques%2023%20-%20L'Horreur%20sur%20Titan.pdf" },
   { n: 24, t: 'La Tour du Destin',                  pdf: 'Defis%20Fantastiques%2024%20-%20La%20Tour%20du%20Destin.pdf' },
@@ -97,132 +75,67 @@ const BOOKS = [
   { n: 59, t: 'La Malédiction de la Momie (rééd.)', pdf: 'Defis%20Fantastiques%2059%20-%20La%20Malediction%20de%20la%20Momie.pdf' },
 ];
 
-/* ══════════════════════════════════════════
-   PROFILS PAR LIVRE
-   Chaque profil définit :
-   - theme    : identifiant du thème
-   - label    : nom affiché du thème
-   - era      : époque / univers (pour les noms)
-   - icon     : emoji représentatif
-   - color    : couleur d'accent du wizard
-   - equipment: liste d'objets de départ (remplace le standard)
-   - nameStyle: style de noms à générer
-   - hint     : conseil affiché dans le wizard
-   - special  : règles particulières à signaler
-══════════════════════════════════════════ */
-
-// Thèmes disponibles
+// ── Thèmes par univers ───────────────────
 const THEMES = {
   fantasy: {
-    label: 'Fantasy médiévale',
-    icon:  '⚔️',
-    color: '#8a6520',
+    label: 'Fantasy médiévale', icon: '⚔️', color: '#8a6520',
     equipment: ['Épée', 'Armure de cuir', 'Lanterne'],
     nameStyle: 'fantasy',
     hint: 'Univers classique de Titan — épées, magie et donjons.',
     special: null,
   },
   scifi: {
-    label: 'Science-fiction',
-    icon:  '🚀',
-    color: '#1a4a6e',
+    label: 'Science-fiction', icon: '🚀', color: '#1a4a6e',
     equipment: ['Pistolet laser', 'Combinaison spatiale', 'Communicateur', 'Kit de survie'],
     nameStyle: 'modern',
-    hint: 'Univers spatial. Remplacez l\'épée par des armes à énergie.',
+    hint: 'Univers spatial. Les armes à énergie remplacent les épées.',
     special: 'Dans ce livre, le combat peut utiliser des armes à feu ou laser.',
   },
   postapoc: {
-    label: 'Post-apocalyptique',
-    icon:  '🚗',
-    color: '#5a3a1a',
-    equipment: ['Fusil de chasse', 'Voiture blindée', 'Jerricane d\'essence', 'Trousse de secours', 'Carte routière'],
+    label: 'Post-apocalyptique', icon: '🚗', color: '#5a3a1a',
+    equipment: ['Fusil de chasse', 'Voiture blindée', 'Jerricane d\'essence', 'Trousse de secours'],
     nameStyle: 'modern',
     hint: 'Monde dévasté, routes dangereuses. Votre véhicule est votre meilleure arme.',
     special: 'Votre véhicule a ses propres points de carrosserie à gérer séparément.',
   },
   horror: {
-    label: 'Horreur moderne',
-    icon:  '👻',
-    color: '#3a1a3a',
+    label: 'Horreur', icon: '👻', color: '#3a1a3a',
     equipment: ['Lampe torche', 'Crucifix', 'Couteau', 'Carnet de notes'],
     nameStyle: 'modern',
-    hint: 'Ambiance gothique ou horreur contemporaine. Attention à votre santé mentale !',
+    hint: 'Ambiance gothique ou horreur contemporaine.',
     special: 'Certains livres ajoutent un score de PEUR en plus des stats habituelles.',
   },
-  superhero: {
-    label: 'Super-héros',
-    icon:  '🦸',
-    color: '#1a1a6e',
-    equipment: ['Costume de super-héros', 'Grappin', 'Insigne'],
-    nameStyle: 'superhero',
-    hint: 'Vous incarnez un super-héros dans une ville moderne. Choisissez votre pouvoir !',
-    special: 'Votre pouvoir spécial (Force surhumaine, Télékinésie, Technologie, Énergie) est choisi au début.',
-  },
   samurai: {
-    label: 'Japon féodal',
-    icon:  '⛩️',
-    color: '#6e1a1a',
+    label: 'Japon féodal', icon: '⛩️', color: '#6e1a1a',
     equipment: ['Katana', 'Wakizashi', 'Armure de samouraï (do-maru)', 'Rations de riz'],
     nameStyle: 'japanese',
-    hint: 'Univers du Japon féodal. L\'honneur est aussi important que la survie.',
-    special: 'Ce livre inclut un score d\'HONNEUR qui influence certaines situations.',
+    hint: "Univers du Japon féodal. L'honneur est aussi important que la survie.",
+    special: "Ce livre inclut un score d'HONNEUR qui influence certaines situations.",
   },
   egypt: {
-    label: 'Égypte antique',
-    icon:  '🏺',
-    color: '#8a6520',
+    label: 'Égypte antique', icon: '🏺', color: '#8a6520',
     equipment: ['Khépesh (épée courbe)', 'Bouclier en bois', 'Amulette', 'Provisions'],
     nameStyle: 'ancient',
-    hint: 'Pyramides, malédictions et dieux égyptiens. Méfiez-vous des pièges anciens.',
+    hint: 'Pyramides, malédictions et dieux égyptiens.',
     special: null,
   },
 };
 
 // Association livre → thème
 const BOOK_THEMES = {
-  // Fantasy classique (défaut)
-  1:'fantasy', 2:'fantasy', 3:'fantasy', 4:'fantasy', 5:'fantasy',
-  6:'fantasy', 7:'fantasy', 8:'fantasy', 9:'fantasy', 10:'fantasy',
-  11:'fantasy', 12:'fantasy', 15:'fantasy', 18:'fantasy', 19:'fantasy',
-  20:'fantasy', 21:'fantasy', 24:'fantasy', 25:'fantasy', 26:'fantasy',
-  27:'fantasy', 28:'fantasy', 29:'fantasy', 31:'fantasy', 32:'fantasy',
-  33:'fantasy', 34:'fantasy', 35:'fantasy', 40:'fantasy', 41:'fantasy',
-  42:'fantasy', 43:'fantasy', 44:'fantasy', 45:'fantasy', 46:'fantasy',
-  47:'fantasy', 48:'fantasy', 50:'fantasy', 51:'fantasy', 52:'fantasy',
-  53:'fantasy', 54:'fantasy', 55:'fantasy', 56:'fantasy', 57:'fantasy',
-
   // Science-fiction
-  16:'scifi',  // La Galaxie Maudite (Starship Traveller)
-  17:'scifi',  // L'Ennemi du Temps
-  22:'scifi',  // Le Robot de Glace
-  23:'scifi',  // L'Horreur sur Titan
-  30:'scifi',  // La Rébellion des Robots
-  37:'scifi',  // Le Guerrier d'Acier
-
+  16: 'scifi', 17: 'scifi', 22: 'scifi', 23: 'scifi', 30: 'scifi', 37: 'scifi',
   // Post-apocalyptique
-  36:'postapoc', // Le Chasseur de Primes (Freeway Fighter)
-
-  // Horreur moderne
-  38:'horror',  // La Demeure des Morts (House of Hell)
-  39:'horror',  // Le Retour de Vampyr
-  49:'horror',  // La Pyramide de l'Horreur
-  58:'horror',  // Le Retour du Vampire
-  59:'horror',  // La Malédiction de la Momie
-
-  // Super-héros
-  // Appointment with FEAR — n°29 dans la version FR est Terre des Dieux
-  // #27 est l'arène, le super-héros est le #29 en VO mais selon traductions varies
-  // On marque les numéros connus
-  49:'horror',
-
+  36: 'postapoc',
+  // Horreur
+  38: 'horror', 39: 'horror', 49: 'horror', 58: 'horror', 59: 'horror',
   // Japon féodal
-  14:'samurai', // L'Épée du Samouraï
-
+  14: 'samurai',
   // Égypte antique
-  13:'egypt',  // La Malédiction de la Momie
+  13: 'egypt',
 };
 
-// Noms par style
+// ── Noms par style ───────────────────────
 const NAMES_BY_STYLE = {
   fantasy: {
     prefix: ['Ald','Bra','Cal','Dor','Eld','Fal','Gar','Hal','Ith','Jor',
@@ -237,10 +150,12 @@ const NAMES_BY_STYLE = {
               'le Sage',"l'Ombre",'le Forgeron','la Chasseresse',
               'le Pèlerin',"l'Érudit",'la Sentinelle'],
     female: ['Aelindra','Sylvara','Myrène','Elowen','Ithilwen','Caladria',
-              'Nyriel','Selvaine','Thariel','Rysara','Briavel','Cenara'],
+              'Nyriel','Selvaine','Thariel','Rysara','Briavel','Cenara',
+              'Fenwyn','Lyreith','Morwenna'],
     male:   ['Aldric','Braxton','Caldor','Dorian','Elvaren','Falkor',
               'Garreth','Halsten','Irvaan','Jorund','Keldar','Lorian',
-              'Malvern','Nordan','Pelador','Randor','Sorvan','Taldris','Vorath'],
+              'Malvern','Nordan','Orskel','Pelador','Randor','Sorvan',
+              'Taldris','Vorath'],
   },
   modern: {
     female: ['Alex','Jordan','Morgan','Casey','Riley','Quinn','Taylor',
@@ -248,15 +163,7 @@ const NAMES_BY_STYLE = {
     male:   ['Marcus','Jake','Ryan','Cole','Dex','Zane','Victor','Ethan',
               'Lucas','Nathan','Owen','Tyler','Kyle','Adrian','Dean'],
     titles: ['dit La Machine','dit Le Survivant','la Téméraire',
-              'le Chasseur','dit Le Fantôme','la Solitaire','dit L\'Acier'],
-  },
-  superhero: {
-    female: ['Laura','Diana','Vera','Elena','Nadia','Sandra','Irene','Tara'],
-    male:   ['Mark','Steve','Brian','Clark','Victor','Rex','Dan','Alan'],
-    heroNames: ['Silver Crusader','Iron Hawk','Shadow Fox','Steel Eagle',
-                'Thunder Shield','Dark Sentinel','Omega Force','Night Wolf'],
-    titles: ['aka Le Justicier','aka L\'Ange de l\'Acier','aka Le Bouclier',
-              'aka La Tempête','aka L\'Ombre','aka Le Titan'],
+              'le Chasseur','dit Le Fantôme','la Solitaire',"dit L'Acier"],
   },
   japanese: {
     male:   ['Hiro','Kenji','Takeshi','Ryū','Daisuke','Makoto','Shiro',
@@ -272,41 +179,40 @@ const NAMES_BY_STYLE = {
               'Nakhti','Meriptah','Userhat','Amenmes','Sennefer'],
     female: ['Nefertari','Isis','Hathor','Merytaten','Ankhesenamun',
               'Sitamun','Nefertiti','Tiy','Henuttawy','Mutnofret'],
-    titles: ['Fils du Nil','Servante d\'Isis','Bras d\'Amon',
-              'Œil de Rê','Lame du Pharaon','Gardien des Tombes'],
+    titles: ['Fils du Nil','Servante des Dieux','Bras d\'Amon',
+              "Œil de Rê",'Lame du Pharaon','Gardien des Tombes'],
   },
 };
 
+// Alias pour compatibilité
+const NAME_PARTS = NAMES_BY_STYLE.fantasy;
+
+// ── Icônes d'objets ──────────────────────
 function itemIcon(name) {
   const n = name.toLowerCase();
-  if (/épée|sabre|lame|dague|couteau|hache|massue|arme/.test(n)) return '⚔️';
-  if (/bouclier|armure|casque|cuirasse/.test(n))                  return '🛡';
-  if (/pistolet|fusil|laser|blaster|arme à feu/.test(n))         return '🔫';
-  if (/bouclier|armure|casque|cuirasse|do-maru/.test(n))         return '🛡';
-  if (/combinaison|costume|tenue/.test(n))                        return '🦺';
+  if (/épée|sabre|lame|dague|couteau|hache|massue|katana|wakizashi|khépesh/.test(n)) return '⚔️';
+  if (/pistolet|fusil|laser|blaster|arme à feu/.test(n))   return '🔫';
+  if (/bouclier|armure|casque|cuirasse|do-maru/.test(n))   return '🛡';
+  if (/combinaison|costume|tenue/.test(n))                  return '🦺';
   if (/potion|fiole|élixir|remède|adresse|vigueur|fortune|trousse/.test(n)) return '🧪';
   if (/livre|parchemin|carte|lettre|note|sort|carnet|manuel/.test(n)) return '📜';
-  if (/clé|clef/.test(n))                                        return '🗝';
-  if (/lampe|torche|lanterne/.test(n))                           return '🕯';
-  if (/corde/.test(n))                                           return '🪢';
-  if (/grappin|crochet/.test(n))                                 return '🪝';
-  if (/outil|kit/.test(n))                                       return '🔧';
-  if (/flèche|arc/.test(n))                                      return '🏹';
-  if (/bâton|staff|sceptre/.test(n))                             return '🪄';
-  if (/amulette|anneau|bague|talisman|crucifix/.test(n))         return '💍';
-  if (/voiture|véhicule|moto|camion/.test(n))                    return '🚗';
-  if (/vaisseau|navette|spatiale/.test(n))                       return '🚀';
-  if (/essence|carburant|jerricane/.test(n))                     return '⛽';
-  if (/rations|provisions|nourriture|riz/.test(n))               return '🍖';
-  if (/communicateur|radio|téléphone/.test(n))                   return '📡';
-  if (/or|pièce|monnaie|crédit/.test(n))                         return '🪙';
-  if (/insigne|badge|emblème/.test(n))                           return '🏅';
+  if (/clé|clef/.test(n))                                  return '🗝';
+  if (/lampe|torche|lanterne/.test(n))                     return '🕯';
+  if (/corde/.test(n))                                     return '🪢';
+  if (/grappin|crochet/.test(n))                           return '🪝';
+  if (/outil|kit/.test(n))                                 return '🔧';
+  if (/flèche|arc/.test(n))                                return '🏹';
+  if (/bâton|staff|sceptre/.test(n))                       return '🪄';
+  if (/amulette|anneau|bague|talisman|crucifix/.test(n))   return '💍';
+  if (/voiture|véhicule|moto|camion/.test(n))              return '🚗';
+  if (/vaisseau|navette|spatiale/.test(n))                 return '🚀';
+  if (/essence|carburant|jerricane/.test(n))               return '⛽';
+  if (/rations|provisions|nourriture|riz/.test(n))         return '🍖';
+  if (/communicateur|radio|téléphone/.test(n))             return '📡';
+  if (/or|pièce|monnaie|crédit/.test(n))                   return '🪙';
+  if (/insigne|badge|emblème/.test(n))                     return '🏅';
   return '🎒';
 }
-
-// ── Alias compatibilité ──────────────────
-// NAME_PARTS pointe sur le style fantasy par défaut
-const NAME_PARTS = NAMES_BY_STYLE.fantasy;
 
 // ── Utilitaire HTML escape ───────────────
 function esc(s) {
