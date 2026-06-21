@@ -48,11 +48,124 @@ function applyTheme(themeKey) {
 function onBookSelected(bookNum, bookTitle) {
   wiz.bookNum = bookNum;
   wiz.book    = bookTitle;
+  wiz.rules   = getBookRules(bookNum);
   const bookInput = document.getElementById('wiz-book');
   if (bookInput) bookInput.value = bookTitle;
   const themeKey = BOOK_THEMES[bookNum] || 'fantasy';
   applyTheme(themeKey);
-  generateName(); // régénérer les noms selon le nouvel univers
+  applyVisualTheme(themeKey);
+  generateName();
+  updateWizardForRules(wiz.rules);
+}
+
+// ── Adapter le wizard selon les règles du livre ──
+function updateWizardForRules(rules) {
+  if (!rules) return;
+
+  // Formules de dés
+  const sf = document.getElementById('wiz-skill-formula');
+  const stf = document.getElementById('wiz-stamina-formula');
+  const lf = document.getElementById('wiz-luck-formula');
+  if (sf)  sf.textContent  = rules.skillFormula   || '1d6 + 6';
+  if (stf) stf.textContent = rules.staminaFormula  || '2d6 + 12';
+  if (lf)  lf.textContent  = rules.luckFormula     || '1d6 + 6';
+
+  // Règles spéciales — bannière
+  const banner = document.getElementById('wiz-book-rules-banner');
+  if (banner) {
+    if (rules.specialRules) {
+      banner.innerHTML = '<strong>⚠️ Règles spéciales pour ce livre :</strong><br>' + rules.specialRules;
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  // Stats supplémentaires
+  renderExtraStats(rules.extraStats || []);
+
+  // Malus Habileté
+  const penaltyEl = document.getElementById('wiz-skill-penalty');
+  if (penaltyEl) {
+    if (rules.skillPenalty) {
+      penaltyEl.textContent = '⚠️ Malus de départ : Habileté ' + rules.skillPenalty + ' jusqu`à trouver une arme.';
+      penaltyEl.style.display = 'block';
+    } else {
+      penaltyEl.style.display = 'none';
+    }
+  }
+
+  // Potion — masquer si livre sans potion
+  const potionSection = document.getElementById('wiz-potion-section');
+  if (potionSection) potionSection.style.display = rules.noPotion ? 'none' : 'block';
+
+  // Or — label personnalisé
+  const goldLabel = document.getElementById('wiz-gold-label');
+  if (goldLabel) goldLabel.textContent = rules.goldLabel || 'Pièces d'Or de départ';
+
+  // Équipement hint
+  const hint = document.getElementById('wiz-equip-hint');
+  if (hint) {
+    const theme = currentTheme();
+    const items = rules.noEquipment
+      ? 'Aucun équipement de départ (vous êtes un civil).'
+      : (rules.equipment || theme.equipment || ['Épée','Armure de cuir','Lanterne']).join(', ');
+    hint.innerHTML = rules.noEquipment
+      ? '<em>⚠️ Aucun équipement — vous êtes un civil sans arme.</em>'
+      : '📦 Équipement inclus : <strong>' + items + '</strong>';
+  }
+
+  // Reset dés si le livre a changé
+  wiz.skill = null; wiz.skillRolled = false;
+  wiz.stamina = null; wiz.staminaRolled = false;
+  wiz.luck = null; wiz.luckRolled = false;
+  const safeText = (id,v) => { const el=document.getElementById(id); if(el) el.textContent=v; };
+  safeText('wiz-skill-roll','–'); safeText('wiz-d-skill','?');
+  safeText('wiz-stamina-roll','–'); safeText('wiz-d-stamina1','?'); safeText('wiz-d-stamina2','?');
+  safeText('wiz-luck-roll','–'); safeText('wiz-d-luck','?');
+}
+
+// ── Stats supplémentaires ─────────────────
+let wizExtraStatValues = {};
+
+function renderExtraStats(extraStats) {
+  const container = document.getElementById('wiz-extra-stats-section');
+  if (!container) return;
+  wizExtraStatValues = {};
+  if (!extraStats || extraStats.length === 0) {
+    container.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+  container.style.display = 'block';
+  container.innerHTML = '<div style="font-family:var(--font-ui,'Cinzel',serif);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:8px;">📊 Stats supplémentaires</div>';
+  extraStats.forEach(stat => {
+    if (stat.formula === 'fixe') {
+      wizExtraStatValues[stat.key] = stat.fixed;
+      container.innerHTML += `<div style="margin-bottom:10px;padding:10px 12px;background:rgba(26,15,0,.06);border:1px solid rgba(201,168,76,.25);border-radius:4px;">
+        <div style="font-family:var(--font-ui,'Cinzel',serif);font-size:11px;color:var(--ink-light);">${stat.label} : <strong>${stat.fixed}</strong> (valeur fixe)</div>
+      </div>`;
+    } else {
+      container.innerHTML += `<div style="margin-bottom:10px;padding:10px 12px;background:rgba(26,15,0,.06);border:1px solid rgba(201,168,76,.25);border-radius:4px;">
+        <div style="font-family:var(--font-ui,'Cinzel',serif);font-size:11px;color:var(--ink-light);margin-bottom:6px;">${stat.label} (${stat.formula})</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="d" id="extra-die-${stat.key}" style="width:42px;height:42px;font-size:18px;background:linear-gradient(135deg,#2d1500,#1a0a00);border:2px solid var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-title,'Cinzel Decorative',cursive);color:var(--gold-light);">?</div>
+          <span style="font-family:var(--font-title,'Cinzel Decorative',cursive);font-size:24px;color:var(--ink);" id="extra-val-${stat.key}">–</span>
+          <button class="roll-btn" onclick="rollExtraStat('${stat.key}',${stat.dice},${stat.bonus})" style="font-size:10px;padding:7px 12px;">🎲 Lancer</button>
+        </div>
+      </div>`;
+    }
+  });
+}
+
+function rollExtraStat(key, dice, bonus) {
+  const rolls = Array.from({length:dice}, () => Math.floor(Math.random()*6)+1);
+  const total = rolls.reduce((a,b)=>a+b,0) + bonus;
+  animDie('extra-die-' + key, rolls[0], () => {
+    const valEl = document.getElementById('extra-val-' + key);
+    if (valEl) valEl.textContent = total;
+    wizExtraStatValues[key] = total;
+  });
 }
 
 // ── Navigation ────────────────────────────
@@ -146,9 +259,10 @@ function d6() { return Math.floor(Math.random() * 6) + 1; }
 
 function wizRoll() {
   const step = wiz.step;
-  if      (step === 2) _rollStat('skill',   ['wiz-d-skill'],                   1, 6);
-  else if (step === 3) _rollStat('stamina', ['wiz-d-stamina1','wiz-d-stamina2'], 2, 12);
-  else if (step === 4) _rollStat('luck',    ['wiz-d-luck'],                     1, 6);
+  const r = wiz.rules || getBookRules(wiz.bookNum);
+  if      (step === 2) _rollStat('skill',   ['wiz-d-skill'],                   r.skillDice   || 1, r.skillBonus   || 6);
+  else if (step === 3) _rollStat('stamina', ['wiz-d-stamina1','wiz-d-stamina2'], r.staminaDice || 2, r.staminaBonus || 12);
+  else if (step === 4) _rollStat('luck',    ['wiz-d-luck'],                     r.luckDice    || 1, r.luckBonus    || 6);
 }
 
 function _rollStat(stat, dieIds, numDice, bonus) {
@@ -255,28 +369,45 @@ function buildSummary() {
 
 // ── Finalisation ──────────────────────────
 function wizFinish() {
-  const pt        = POTION_TYPES[wiz.potion || 'stamina'];
-  const theme     = currentTheme();
-  const baseItems = (theme.equipment || ['Épée', 'Armure de cuir', 'Lanterne'])
-    .map(name => ({ name, qty: 1 }));
-  baseItems.push({ name: pt.label + ' (2 mesures)', qty: 1 });
-  wizExtraItems.forEach(n => baseItems.push({ name: n, qty: 1 }));
+  const rules  = wiz.rules || getBookRules(wiz.bookNum);
+  const pt     = POTION_TYPES[wiz.potion || 'stamina'];
+  const theme  = currentTheme();
+
+  // Équipement de départ selon les règles du livre
+  let baseEquip = [];
+  if (!rules.noEquipment) {
+    const equipList = rules.equipment || theme.equipment || ['Épée', 'Armure de cuir', 'Lanterne'];
+    baseEquip = equipList.map(function(name) { return { name: name, qty: 1 }; });
+    if (!rules.noPotion) {
+      baseEquip.push({ name: pt.label + ' (2 mesures)', qty: 1 });
+    }
+  }
+  wizExtraItems.forEach(function(n) { baseEquip.push({ name: n, qty: 1 }); });
+
+  // Stats de base avec malus éventuel
+  var skillVal = wiz.skill;
+  var skillDisplay = skillVal + (rules.skillPenalty ? ' (' + rules.skillPenalty + ' temp.)' : '');
 
   state = {
     name: wiz.name, book: wiz.book, bookNum: wiz.bookNum,
-    theme: wiz.theme,
-    skill:   wiz.skill,   skillMax:   wiz.skill,
+    theme: wiz.theme, visualTheme: wiz.theme,
+    skill:   wiz.skill + (rules.skillPenalty || 0),
+    skillMax: wiz.skill,
     stamina: wiz.stamina, staminaMax: wiz.stamina,
     luck:    wiz.luck,    luckMax:    wiz.luck,
     gold: wiz.gold || 0, meals: 0,
-    potions: 2, potionsTotal: 2,
+    potions: rules.noPotion ? 0 : 2,
+    potionsTotal: rules.noPotion ? 0 : 2,
     potionType: wiz.potion || 'stamina',
-    items: baseItems,
-    notes: '', paras: '', diceHistory: [],
+    extraStats: wizExtraStatValues,
+    items: baseEquip,
+    notes: rules.specialRules ? ('📋 RÈGLES SPÉCIALES:\n' + rules.specialRules + '\n\n') : '',
+    paras: '', diceHistory: [],
   };
 
   localStorage.setItem(SAVE_KEY, JSON.stringify(state));
   document.getElementById('wizard').style.display = 'none';
+  applyVisualTheme(wiz.theme || 'fantasy');
   render();
   toast(theme.icon + ' Que l\'aventure commence, ' + state.name + ' !');
 }
@@ -318,6 +449,7 @@ function reopenWizard() {
     .forEach((o, i) => o.classList.toggle('selected', i === 0));
 
   renderWizExtraList();
+  applyVisualTheme('fantasy');
   document.getElementById('wizard').style.display = 'flex';
   wizGo(0);
 }

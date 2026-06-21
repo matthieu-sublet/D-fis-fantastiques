@@ -2,17 +2,42 @@
    ui.js — Rendu de l'interface principale
 ══════════════════════════════════════════ */
 
-// ── Ouvrir le PDF du livre courant ───────
-function openCurrentBookPDF() {
-  const bookNum = state.bookNum || (state.book ? parseInt(state.book) : null);
-  if (bookNum) {
-    openBookPDF(bookNum);
+// ── Panneau Livre (iframe PDF) ───────────
+function renderBookPanel() {
+  const empty  = document.getElementById('book-panel-empty');
+  const viewer = document.getElementById('book-panel-viewer');
+  const iframe = document.getElementById('book-iframe');
+  const label  = document.getElementById('book-panel-label');
+  const extLink = document.getElementById('book-panel-extlink');
+
+  // Trouver le numéro du livre depuis l'état
+  let bookNum = state.bookNum || null;
+  if (!bookNum && state.book) {
+    const m = state.book.match(/^#(\d+)/);
+    if (m) bookNum = parseInt(m[1]);
+  }
+
+  const book = bookNum ? BOOKS.find(b => b.n === bookNum) : null;
+
+  if (!book || !book.pdf) {
+    empty.style.display  = 'flex';
+    viewer.style.display = 'none';
     return;
   }
-  // Tenter de déduire depuis le titre stocké (#N — Titre)
-  const match = (state.book || '').match(/^#(\d+)/);
-  if (match) { openBookPDF(parseInt(match[1])); return; }
-  toast('❌ Aucun livre associé à ce personnage.');
+
+  const url = BASE_PDF + book.pdf;
+
+  empty.style.display  = 'none';
+  viewer.style.display = 'flex';
+
+  // Charger l'iframe seulement si l'URL a changé (évite rechargement à chaque clic)
+  if (iframe.dataset.loaded !== url) {
+    iframe.src = url;
+    iframe.dataset.loaded = url;
+  }
+
+  if (label)   label.textContent = '#' + book.n + ' — ' + book.t;
+  if (extLink) extLink.href = url;
 }
 
 // ── Toast ────────────────────────────────
@@ -32,7 +57,7 @@ function updateHeader() {
 }
 
 // ── Navigation ───────────────────────────
-const TABS = ['stats', 'dice', 'combat', 'inventory', 'notes', 'saves'];
+const TABS = ['stats', 'dice', 'combat', 'inventory', 'notes', 'book', 'saves'];
 
 function showPanel(id) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -40,6 +65,7 @@ function showPanel(id) {
   document.getElementById('panel-' + id).classList.add('active');
   document.querySelectorAll('.nav-tab')[TABS.indexOf(id)].classList.add('active');
   if (id === 'saves') renderSlots();
+  if (id === 'book')  renderBookPanel();
 }
 
 // ── Render principal ─────────────────────
@@ -92,6 +118,11 @@ function render() {
   renderInventory();
 
   updateHeader();
+
+  // Restaurer le thème visuel
+  if (state.theme || state.visualTheme) {
+    applyVisualTheme(state.visualTheme || state.theme || 'fantasy');
+  }
 }
 
 function renderInventory() {

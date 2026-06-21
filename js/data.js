@@ -121,7 +121,7 @@ const THEMES = {
   },
 };
 
-// Association livre → thème
+// ── Association livre → thème visuel ───────
 const BOOK_THEMES = {
   // Science-fiction
   16: 'scifi', 17: 'scifi', 22: 'scifi', 23: 'scifi', 30: 'scifi', 37: 'scifi',
@@ -134,6 +134,165 @@ const BOOK_THEMES = {
   // Égypte antique
   13: 'egypt',
 };
+
+/* ══════════════════════════════════════════
+   RÈGLES SPÉCIFIQUES PAR LIVRE
+   Chaque entrée peut surcharger :
+   - skillFormula    : formule Habileté (défaut: '1d6+6')
+   - staminaFormula  : formule Endurance (défaut: '2d6+12')
+   - luckFormula     : formule Chance (défaut: '1d6+6')
+   - skillBonus      : bonus fixe Habileté (int)
+   - staminaBonus    : bonus fixe Endurance (int)
+   - luckBonus       : bonus fixe Chance (int)
+   - skillDice       : nb de dés Habileté (défaut: 1)
+   - staminaDice     : nb de dés Endurance (défaut: 2)
+   - extraStats      : stats supplémentaires []
+   - equipment       : liste d'objets de départ (remplace défaut)
+   - noEquipment     : true = pas d'équipement de départ
+   - noPotion        : true = pas de potion
+   - noPotionChoice  : true = pas de choix de potion (potion imposée)
+   - potionForced    : type de potion imposée
+   - specialRules    : texte explicatif des règles spéciales
+   - skillPenalty    : malus Habileté de départ (ex: -3 pour House of Hell)
+   - startingGold    : or de départ fixe (si non nul, pas de saisie)
+   - crewStats       : true = créer des stats pour l'équipage (Starship Traveller)
+══════════════════════════════════════════ */
+
+const BOOK_RULES = {
+
+  // ── Règles standard (référence) ─────────
+  _default: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Épée', 'Armure de cuir', 'Lanterne'],
+    noPotion: false,
+    specialRules: null,
+  },
+
+  // ── #16 La Galaxie Maudite (Starship Traveller) ─
+  16: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Phaseur', 'Uniforme de commandant', 'Communicateur'],
+    noPotion: true,
+    crewStats: true,
+    extraStats: [
+      { key: 'weaponsStrength', label: 'Force des armes du vaisseau', formula: '1d6 + 6', dice: 1, bonus: 6 },
+      { key: 'shields',         label: 'Boucliers du vaisseau',       formula: '1d6 + 6', dice: 1, bonus: 6 },
+    ],
+    specialRules: "Vous êtes commandant d'un vaisseau spatial. Vous gérez aussi les stats de votre équipage (Officier Science, Médecin, Ingénieur, Chef Sécurité, 2 Gardes) et les stats du vaisseau (Force d'Armes, Boucliers). Pas de règle de Tenter la Chance dans ce livre.",
+  },
+
+  // ── #17 L'Ennemi du Temps ───────────────
+  17: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Pistolet laser', 'Combinaison de voyage temporel', 'Chrono-détecteur'],
+    noPotion: false,
+    specialRules: 'Voyage dans le temps. Vous pouvez traverser différentes époques historiques.',
+  },
+
+  // ── #22 Le Robot de Glace ───────────────
+  22: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Pistolet laser', 'Combinaison arctique', 'Kit de survie'],
+    noPotion: false,
+    specialRules: 'Aventure de science-fiction sur une planète glacée.',
+  },
+
+  // ── #23 L'Horreur sur Titan ─────────────
+  23: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Pistolet laser', 'Combinaison spatiale', 'Oxygène (12 heures)'],
+    noPotion: false,
+    specialRules: "Vous êtes sur la lune Titan de Saturne. L'atmosphère hostile rend chaque moment précieux.",
+  },
+
+  // ── #30 La Rébellion des Robots ─────────
+  30: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Pistolet laser', 'Combinaison blindée', 'Disrupteur EMP'],
+    noPotion: false,
+    specialRules: 'Les robots se sont rebellés. Vos armes à énergie sont vos seuls alliés.',
+  },
+
+  // ── #36 Le Chasseur de Primes (Freeway Fighter) ─
+  36: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 24', staminaDice: 2, staminaBonus: 24,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Dodge Interceptor blindé', 'Fusil de chasse', 'Pistolet Magnum', 'Trousse de premiers secours (2 utilisations)', 'Spray à huile', 'Pointes de route'],
+    extraStats: [
+      { key: 'firepower', label: 'Puissance de Feu du véhicule', formula: '1d6 + 6', dice: 1, bonus: 6 },
+      { key: 'armour',    label: 'Blindage du véhicule',         formula: '2d6 + 20', dice: 2, bonus: 20 },
+    ],
+    noPotion: true,
+    startingGold: 0,
+    goldLabel: 'Crédits',
+    specialRules: "L'Endurance se calcule avec 2d6+24 (pas +12). Votre véhicule a ses propres stats : Puissance de Feu (1d6+6) et Blindage (2d6+20). Vous avez aussi 4 roquettes. Gérez votre réservoir d'essence — tomber en panne = fin de partie !",
+  },
+
+  // ── #37 Le Guerrier d'Acier ─────────────
+  37: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Corps cybernétique', 'Canon laser intégré', 'Détecteur de mouvement'],
+    noPotion: false,
+    specialRules: 'Vous êtes un robot guerrier. Votre armure est intégrée à votre corps.',
+  },
+
+  // ── #38 La Demeure des Morts (House of Hell) ─
+  38: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    extraStats: [
+      { key: 'fearMax', label: 'Score de PEUR maximum', formula: '1d6 + 6', dice: 1, bonus: 6 },
+    ],
+    noEquipment: true,
+    noPotion: true,
+    skillPenalty: -3,
+    specialRules: "Vous êtes un civil désarmé, piégé dans une maison hantée. Pas d'équipement, pas de potion. Votre Habileté est réduite de 3 jusqu'à trouver une arme. Lancez 1d6+6 pour votre score de PEUR maximum — si vous atteignez ce score, vous mourez de terreur !",
+  },
+
+  // ── #14 L'Épée du Samouraï (Sword of the Samurai) ─
+  14: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    extraStats: [
+      { key: 'honour', label: 'Honneur', formula: 'fixe', fixed: 3 },
+    ],
+    equipment: ['Katana', 'Wakizashi', 'Armure de samouraï (do-maru)', 'Rations de riz (10)'],
+    noPotion: true,
+    specialRules: "Vous êtes un samouraï avec un score d'HONNEUR (commence à 3). Il augmente en aidant les autres, et diminue en agissant de manière déshonorante. Si l'Honneur tombe à 0, votre personnage se fait seppuku (suicide rituel). Vous choisissez aussi des compétences spéciales de combat.",
+  },
+
+  // ── #13 La Malédiction de la Momie ──────
+  13: {
+    skillFormula: '1d6 + 6', skillDice: 1, skillBonus: 6,
+    staminaFormula: '2d6 + 12', staminaDice: 2, staminaBonus: 12,
+    luckFormula: '1d6 + 6', luckDice: 1, luckBonus: 6,
+    equipment: ['Khépesh (épée courbe)', 'Bouclier en bois', 'Amulette sacrée', 'Provisions (10)'],
+    noPotion: false,
+    specialRules: "Aventure en Égypte ancienne. Méfiez-vous des malédictions des pharaons.",
+  },
+};
+
+// Récupérer les règles d'un livre (avec fallback sur défaut)
+function getBookRules(bookNum) {
+  return Object.assign({}, BOOK_RULES._default, BOOK_RULES[bookNum] || {});
+}
 
 // ── Noms par style ───────────────────────
 const NAMES_BY_STYLE = {
